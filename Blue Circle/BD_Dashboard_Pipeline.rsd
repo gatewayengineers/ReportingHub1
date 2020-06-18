@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="BD_Dashboard_Pipeline">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+        </DataSetParameter>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>DECLARE @tbldata TABLE (DataType varchar(30), Extract_Date DATE, BDLbl varchar(50), PipelineAmt decimal(19,2),PMName varchar(255))
+DECLARE @DefaultMktSegName NVARCHAR(54)
+
+SELECT @DefaultMktSegName = ms.MS_BDCode + ' ' + ms.MS_Name
+FROM dbo.MarketSegment ms
+WHERE MS_Key = CASE WHEN @ReportType IN (0,4) THEN @FilterList ELSE 2 END
+
+INSERT INTO @tbldata (DataType, Extract_Date, BDLbl, PipelineAmt, PMName)
+SELECT rpds.DataType
+     , rpds.FullDate AS Extract_Date
+     , BDLbl
+     , ISNULL(data.PipelineAmt,0) AS PipelineAmt
+	 , PMName
+FROM (SELECT DataType
+           , FullDate
+      FROM dbo.ReportingDates rpds
+      CROSS JOIN (SELECT 'Contracted Backlog' AS DataType
+                  UNION ALL
+                  SELECT 'Proposal' AS DataType
+                  UNION ALL
+                  SELECT 'Opportunities' AS DataType) dattyp
+      WHERE rpds.FullDate BETWEEN case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-13) else EOMONTH(GetDate(),-12) end AND case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-1) else EOMONTH(GetDate(),0) end
+AND DAY(rpds.FullDate) = 1) rpds
+LEFT JOIN (
+SELECT CASE WHEN pss.Prj_Type = 'PROP' THEN 'Proposal' 
+            WHEN pss.Prj_Type = 'OPP' THEN 'Opportunities'
+            ELSE 'Contracted Backlog' END AS DataType
+     , pss.Extract_Date AS Extract_Date
+     , ISNULL(prj.MktSegName,@DefaultMktSegName) AS BDLbl
+     , SUM(ContractAmt - CASE WHEN pss.Prj_Type = 'D' THEN RevenueAmt - WIPAmt ELSE 0 END) AS PipelineAmt
+	 ,pm.Emp_LastName + ', ' + pm.Emp_FirstName + ' ' + pm.Emp_MiddleInitial + '.' PMName
+FROM dbo.vPipelineSnapshot pss
+LEFT JOIN dbo.Employee pm
+ON pss.PM_Key = pm.Emp_Key
+LEFT JOIN (SELECT prj_key, 'Ajera' AS SourceSystem, ms.MS_Key, ms.MS_BDCode + ' ' + ms.MS_Name AS MktSegName, 'D' AS Prj_Type
+           FROM dbo.Project prj
+           LEFT JOIN dbo.Client cli
+           ON prj.Cli_Key = cli.Cli_Key
+           LEFT JOIN dbo.MarketSegment ms
+           ON cli.MS_Key = ms.MS_Key
+           OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+           UNION ALL
+           SELECT bdo.Opp_Key AS Prj_Key, 'Business_Development' AS SourceSystem, ms.MS_Key, ms.MS_BDCode + ' ' + ms.MS_Name AS MktSegName, 'OPP' AS Prj_Type
+           FROM Business_Development.dbo.BD_Opportunity bdo
+           JOIN Business_Development.dbo.BD_Clients oppcli
+           ON bdo.Client_idno = oppcli.Cli_idno
+           JOIN dbo.MarketSegment ms
+           ON oppcli.Cli_MktSeg = ms.MS_ID
+           UNION ALL
+           SELECT bdp.Prop_Key AS Prj_Key, 'Business_Development' AS SourceSystem, ms.MS_Key, ms.MS_BDCode + ' ' + ms.MS_Name AS MktSegName, 'Prop' AS Prj_Type
+           FROM Business_Development.dbo.BD_Proposals bdp
+           JOIN Business_Development.dbo.BD_Clients propcli
+           ON bdp.Client_idno = propcli.Cli_idno
+           JOIN dbo.MarketSegment ms
+           ON propcli.Cli_MktSeg = ms.MS_ID
+           ) prj
+ON pss.Prj_Key = prj.Prj_Key
+AND pss.SourceSystem = prj.SourceSystem
+ANd pss.Prj_Type = prj.Prj_Type
+WHERE pss.Extract_Date BETWEEN case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-13) else EOMONTH(GetDate(),-12) end AND case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-1) else EOMONTH(GetDate(),0) end
+AND DAY(pss.Extract_Date) = 1
+AND (   
+        (pss.Prj_Type = 'D' AND (pss.ContractAmt - pss.RevenueAmt) &gt; 50 AND pss.Prj_Status IN ('A')) --,'W')) -- removed 'W' and modified amt threshhold to 50 to match Pipeline report.
+     OR (pss.Prj_Type = 'PROP' AND pss.ContractAmt &gt; 0 AND pss.Prj_Status IN ('A','W')) and pss.Prop_WinLoss IN ('A','W')
+     OR (pss.Prj_Type = 'OPP' AND pss.ContractAmt  &gt; 0 and pss.Prj_Status = 'A')
+    )
+AND (   (
+         @ReportType = 0 
+         --AND NOT (pss.Prj_Key &lt; 0 AND pss.Prj_Type = 'Prop') -- uncomment this to include backfill in corporate report
+        )
+     OR (
+         @ReportType = 1 AND pm.Emp_Key IN (@FilterList)
+        )
+     OR (@ReportType = 4 AND (   (pss.SourceSystem = 'Ajera' AND prj.MS_Key IN (@FilterList))
+                              OR (pss.SourceSystem = 'Business_Development' AND prj.MS_Key IN (@FilterList)))
+                              --OR (pss.SourceSystem = 'Business_Development' AND pss.Prj_Key &lt; 0 AND pss.Prj_Type = 'Prop') -- uncomment this to include the backfill dummy projects in the MSL version of the report
+        )
+    )
+GROUP BY pss.Extract_Date,  CASE WHEN pss.Prj_Type = 'PROP' THEN 'Proposal' 
+            WHEN pss.Prj_Type = 'OPP' THEN 'Opportunities'
+            ELSE 'Contracted Backlog' END
+            , ISNULL(prj.MktSegName,@DefaultMktSegName)
+			,pm.Emp_LastName + ', ' + pm.Emp_FirstName + ' ' + pm.Emp_MiddleInitial + '.'
+			
+) data
+ON rpds.FullDate = data.Extract_Date
+AND rpds.DataType = data.DataType
+
+
+; WITH BDs AS (SELECT 2 AS MS_Key, 'BD-01' AS MS_BDCode, 'Commercial' AS MS_Name
+UNION ALL
+SELECT 3 AS MS_Key, 'BD-02' AS MS_BDCode, 'Consultants' AS MS_Name
+UNION ALL
+SELECT 5 AS MS_Key, 'BD-03' AS MS_BDCode, 'Contractors' AS MS_Name
+UNION ALL
+SELECT 6 AS MS_Key, 'BD-04' AS MS_BDCode, 'Developers' AS MS_Name
+UNION ALL
+SELECT 7 AS MS_Key, 'BD-05' AS MS_BDCode, 'CD 1' AS MS_Name
+UNION ALL
+SELECT 8 AS MS_Key, 'BD-06' AS MS_BDCode, 'CD 2' AS MS_Name
+UNION ALL
+SELECT 10 AS MS_Key, 'BD-07' AS MS_BDCode, 'Schools/Institutional' AS MS_Name
+UNION ALL
+SELECT 11 AS MS_Key, 'BD-08' AS MS_BDCode, 'Energy Upstream' AS MS_Name
+UNION ALL
+SELECT 12 AS MS_Key, 'BD-09' AS MS_BDCode, 'Energy Midstream' AS MS_Name
+)
+, dts AS (SELECT FullDate
+FROM dbo.ReportingDates rpd
+WHERE rpd.DayOfMonth = 1
+AND rpd.FullDate BETWEEN case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-13) else EOMONTH(GetDate(),-12) end AND case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-1) else EOMONTH(GetDate(),0) end)
+SELECT DataType
+, BDs.MS_BDCode + ' ' + BDs.MS_Name AS BDLbl
+, dts.FullDate AS Extract_Date
+, PipelineAmt
+,data.PMName
+FROM BDs
+CROSS JOIN dts
+LEFT JOIN @tbldata data
+ON BDs.MS_BDCode + ' ' + BDs.MS_Name = data.BDLbl
+AND dts.FullDate = data.Extract_Date
+WHERE (@ReportType IN (0,1)
+       OR @ReportType = 4 AND BDs.MS_Key IN (@FilterList))
+UNION ALL
+SELECT 'Total' AS DataType
+, BDs.MS_BDCode + ' ' + BDs.MS_Name AS BDLbl 
+, dts.FullDate AS Extract_Date
+, 0.1*SUM(PipelineAmt) AS PipelineAmt /* 0.1 multiplcation used to add "transparent" total group to allow for stacked bar/column chart labels */
+,data.PMName
+FROM BDs
+CROSS JOIN dts
+LEFT JOIN @tbldata data
+ON BDs.MS_BDCode + ' ' + BDs.MS_Name = data.BDLbl
+AND dts.FullDate = data.Extract_Date
+WHERE (@ReportType IN (0,1)
+       OR @ReportType = 4 AND BDs.MS_Key IN (@FilterList))
+GROUP BY BDs.MS_BDCode + ' ' + BDs.MS_Name, dts.FullDate,data.PMName</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="DataType">
+        <DataField>DataType</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PipelineAmt">
+        <DataField>PipelineAmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="BDLbl">
+        <DataField>BDLbl</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Extract_Date">
+        <DataField>Extract_Date</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="PMName">
+        <DataField>PMName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <Description />
+  <DataSet Name="ProjectManager_MonthNEMSnapshot">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@PM_Key">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>If GETDATE() &lt; dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,GETDATE()),GETDATE())), 1))
+SELECT @PM_Key AS Emp_Key
+     , emp.Emp_FirstName
+     , emp.Emp_LastName
+     , emp.Emp_MiddleInitial
+     , RTRIM(emp.Emp_LastName) + ', ' + RTRIM(emp.Emp_FirstName) + ' ' + RTRIM(emp.Emp_MiddleInitial) + '.' AS PM_NAME
+     , rpd.FullDate AS PRMMonthDate
+     , ISNULL(NEM.PM_NEM_ACT,0) AS PM_NEM_ACT
+     , ISNULL(NEM.PM_NEM_LTM,0) AS PM_NEM_LTM
+     FROM dbo.ReportingDates rpd
+CROSS JOIN dbo.Employee emp
+LEFT JOIN (
+SELECT pmns.Emp_Key
+     , pmns.PRMMonthDate
+     , PM_NEM_ACT
+     , PM_NEM_LTM
+FROM dbo.PmMonthlyNEMSnapshot pmns
+WHERE PRMMonthDate &gt; EOMONTH(DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1),-13)
+AND pmns.Emp_Key = @PM_Key) NEM
+ON rpd.FullDate = NEM.PRMMonthDate
+WHERE rpd.FullDate &gt; EOMONTH(DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1),-13)
+AND rpd.FullDate &lt; EOMONTH(DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1),-1)
+AND DAY(rpd.FullDate) = 1
+AND emp.Emp_Key = @PM_Key
+ELSE 
+SELECT @PM_Key AS Emp_Key
+     , emp.Emp_FirstName
+     , emp.Emp_LastName
+     , emp.Emp_MiddleInitial
+     , RTRIM(emp.Emp_LastName) + ', ' + RTRIM(emp.Emp_FirstName) + ' ' + RTRIM(emp.Emp_MiddleInitial) + '.' AS PM_NAME
+     , rpd.FullDate AS PRMMonthDate
+, ISNULL(NEM.PM_NEM_ACT,0) AS PM_NEM_ACT
+     , ISNULL(NEM.PM_NEM_LTM,0) AS PM_NEM_LTM
+     FROM dbo.ReportingDates rpd
+CROSS JOIN dbo.Employee emp
+LEFT JOIN (
+SELECT pmns.Emp_Key
+     , pmns.PRMMonthDate
+     , PM_NEM_ACT
+     , PM_NEM_LTM
+FROM dbo.PmMonthlyNEMSnapshot pmns
+WHERE PRMMonthDate &gt; EOMONTH(GetDate(),-13)
+AND pmns.Emp_Key = @PM_Key) NEM
+ON rpd.FullDate = NEM.PRMMonthDate
+WHERE rpd.FullDate &gt; EOMONTH(GETDATE(),-13)
+AND rpd.FullDate &lt;= EOMONTH(GetDate(),-1)
+AND DAY(rpd.FullDate) = 1
+AND emp.Emp_Key = @PM_Key</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Emp_Key">
+        <DataField>Emp_Key</DataField>
+        <rd:TypeName>System.Object</rd:TypeName>
+      </Field>
+      <Field Name="Emp_FirstName">
+        <DataField>Emp_FirstName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_LastName">
+        <DataField>Emp_LastName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_MiddleInitial">
+        <DataField>Emp_MiddleInitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_NAME">
+        <DataField>PM_NAME</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PRMMonthDate">
+        <DataField>PRMMonthDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="PM_NEM_ACT">
+        <DataField>PM_NEM_ACT</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="PM_NEM_LTM">
+        <DataField>PM_NEM_LTM</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

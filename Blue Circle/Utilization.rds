@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Utilization">
+  <ConnectionProperties>
+    <Extension>SQL</Extension>
+    <ConnectString>Data Source=pghsql12;Initial Catalog=Utilization_Yearly</ConnectString>
+  </ConnectionProperties>
+  <DataSourceID>d9ca0187-47d8-4ade-a310-e53733784764</DataSourceID>
+</RptDataSource>

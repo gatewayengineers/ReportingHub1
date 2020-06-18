@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <Description />
+  <DataSet Name="Projects_MarkupsWriteOffs">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@OperationsReport">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Int32</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+          <rd:IsMultiValued>true</rd:IsMultiValued>
+        </DataSetParameter>
+        <DataSetParameter Name="@UserName">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Int32</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>WITH  wo AS (SELECT wo.prj_key
+                  , wo.inv_number
+                  , wo.Wo_Date
+                  , SUM(wo.WO_Amt) WO_Amt
+                  , SUM(wo.Actual_Invoice) as inv_amt
+             FROM dbo.vWriteOffs wo
+             CROSS JOIN dbo.ReportingDates rpd
+             WHERE rpd.FullDate = CAST(DATEADD(dd,-7,GetDate()) AS DATE)
+             AND (@ReportType &lt;&gt; 4 AND (wo.wo_date &gt;= case when GETDATE() &lt; dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,GETDATE()),GETDATE())), 1)) then
+ DATEADD(dd,1,EOMONTH(GetDate(),-3)) else  DATEADD(dd,1,EOMONTH(GetDate(),-2)) end
+             AND   wo.wo_date &lt; case when GETDATE() &lt; dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,GETDATE()),GETDATE())), 1)) then
+DATEADD(dd,1,EOMONTH(GetDate(),-2)) else DATEADD(dd,1,EOMONTH(GetDate(),-1)) end)
+             OR (@ReportType = 4 AND wo.wo_date BETWEEN rpd.RptWeekStartDate AND rpd.RptWeekEndDate))
+             GROUP BY wo.prj_key
+                    , wo.inv_number
+                    , wo.Wo_Date
+                    )
+SELECT SUM(ISNULL(wo.inv_amt,0)) AS Actual_Invoice
+     , SUM(WO_Amt) AS WO_Amt
+     , wo.Wo_Date
+     , wo.Inv_number AS Invoice_Number
+     , prj.Prj_idno
+     , prj.prj_name AS Prj_lngname
+     , pic.Emp_Initials AS Prj_picintials
+     , pm.Emp_initials AS PrjPM
+     , case when GETDATE() &lt; dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,GETDATE()),GETDATE())), 1)) then DATENAME(MM, DATEADD(MM, - 2, GetDate())) else DATENAME(MM, DATEADD(MM, - 1, GetDate())) end AS MON
+     , pm.Emp_LastName
+     , pm.Emp_FirstName
+     , pm.Emp_MiddleInitial
+     , RTRIM(pm.Emp_LastName) + ', ' + RTRIM(pm.Emp_FirstName) + ' ' + RTRIM(pm.Emp_MiddleInitial) + '.' AS PM_Name
+     , pic.Emp_LastName AS PIC_LastName
+     , pic.Emp_FirstName AS PIC_FirstName
+     , pic.Emp_MiddleInitial AS PIC_MiddleInitial
+     , RTRIM(pic.Emp_LastName) + ', ' + RTRIM(pic.Emp_FirstName) + ' ' + RTRIM(pic.Emp_MiddleInitial) + '.' AS PIC_Name
+     , prj.Prj_BillingWeek
+FROM wo
+JOIN dbo.Project prj
+ON wo.prj_key = prj.prj_key
+JOIN dbo.Employee pm
+ON prj.PM_Key = pm.emp_key
+JOIN dbo.Employee pic
+ON prj.PIC_Key = pic.emp_key
+WHERE (((@OperationsReport = 1)
+      AND    (@ReportType = 1 AND pm.Emp_Key  IN (@FilterList))
+          OR (@ReportType = 2 AND pic.Emp_Key IN (@FilterList))
+          OR (@ReportType = 3) -- MOR_WriteOff
+          OR (@ReportType = 4) -- Weekly WO
+      )
+OR    ((@OperationsReport = 0)
+      AND    (@ReportType = 1 AND pm.emp_companyusername = @UserName)
+          OR (@ReportType = 2 AND pic.Emp_CompanyUserName = @UserName)
+      ))
+GROUP BY wo.Inv_Number
+       , wo.Wo_Date
+       , prj.Prj_idno
+       , prj.prj_name
+       , pm.Emp_initials
+       , pm.Emp_LastName
+       , pm.Emp_FirstName
+       , pm.Emp_MiddleInitial
+       , pic.Emp_initials
+       , pic.Emp_LastName
+       , pic.Emp_FirstName
+       , pic.Emp_MiddleInitial
+       , prj.Prj_BillingWeek
+HAVING SUM(wo.WO_Amt) &lt;&gt; 0</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Actual_Invoice">
+        <DataField>Actual_Invoice</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Invoice_Number">
+        <DataField>Invoice_Number</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="WO_amt">
+        <DataField>WO_Amt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Wo_Date">
+        <DataField>Wo_Date</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="PrjPM">
+        <DataField>PrjPM</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_idno">
+        <DataField>Prj_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_lngname">
+        <DataField>Prj_lngname</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MON">
+        <DataField>MON</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_picintials">
+        <DataField>Prj_picintials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_LastName">
+        <DataField>Emp_LastName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_FirstName">
+        <DataField>Emp_FirstName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_MiddleInitial">
+        <DataField>Emp_MiddleInitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_Name">
+        <DataField>PM_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_LastName">
+        <DataField>PIC_LastName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_FirstName">
+        <DataField>PIC_FirstName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_MiddleInitial">
+        <DataField>PIC_MiddleInitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Name">
+        <DataField>PIC_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_BillingWeek">
+        <DataField>Prj_BillingWeek</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

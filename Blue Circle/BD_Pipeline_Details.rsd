@@ -1,0 +1,346 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="BD_Pipeline_Details">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@CSVFilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>DECLARE @spResults dbo.PFRTypeTable
+DECLARE @FilterTable TABLE (ItemNumber INT, Item INT)
+INSERT INTO @spResults EXECUTE [dbo].[PFR_GetByList] @CSVFilterList, @ReportType, 0
+
+INSERT INTO @FilterTable
+SELECT ItemNumber, Item
+FROM dbo.DelimitedSplit8K(@CSVFilterList,',')
+WHERE Item IS NOT NULL
+AND Item &lt;&gt; ''
+
+
+SELECT msl.Emp_Initials as MSL_Initials
+     , pic.Emp_Initials as PIC_Initials
+     , pm.Emp_Initials as PM_Initials
+     , MS.MS_Name
+	 ,ms.MS_BDCode
+     , CASE WHEN @ReportType = 1 THEN pm.Emp_Key 
+            WHEN @ReportType = 4 THEN ms.MS_ID END AS FilterKey
+     , CASE WHEN @ReportType = 1 THEN RTRIM(pm.Emp_LastName) + ', ' + RTRIM(pm.Emp_FirstName) + ' ' + RTRIM(pm.Emp_MiddleInitial) + '.'
+            WHEN @ReportType = 4 THEN RTRIM(msl.Emp_LastName) + ', ' + RTRIM(msl.Emp_FirstName) + ' ' + RTRIM(msl.Emp_MiddleInitial) + '. - ' + ms.MS_Name END AS FilterDisplayName
+     , cli.Cli_Name
+     , prj.Prj_idno
+     , prj.Prj_Name
+     , SUM(phs_totContract) AS ContractAmt
+     , SUM(phs_totrev) AS phaserev
+     , SUM(prj_totrev) - Sum(Phs_wip) AS RevenueAmt
+     , CASE WHEN SUM(phs_totContract) - (SUM(prj_totrev)- Sum(Phs_wip)) &lt; 0 THEN 0 ELSE SUM(phs_totContract) - (SUM(prj_totrev)- Sum(Phs_wip)) END AS BacklogAmt
+     , NULL AS Prop_idno
+     , NULL AS Prop_name
+     , NULL AS Prop_pvalue
+     , NULL AS Prop_rnk
+     , NULL AS Prop_rnkvalue
+     , NULL AS Prop_duedate
+     , NULL AS Prop_submitdate
+     , NULL AS Prop_nxtactivity
+     , NULL AS Prop_winloss
+     , NULL AS Prop_status
+     , NULL AS Projected_Revenue
+     , NULL AS Cur_Project_Revenue
+     , NULL AS Opp_idno
+     , NULL AS Opp_name
+     , NULL AS Opp_pvalue
+     , NULL AS Opp_rnk
+     , NULL AS Opp_rnkvalue
+     , NULL AS Opp_nxtactivity
+     , NULL AS Opp_creationdate
+	 
+FROM dbo.Project prj
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.MarketSegment ms
+ON cli.MS_Key = ms.MS_Key
+JOIN @spResults sp
+ON sp.prj_key = prj.prj_key
+JOIN dbo.Employee pm
+On sp.pm_key = pm.emp_key
+JOIN dbo.Employee pic
+On sp.pic_key = pic.emp_key
+JOIN dbo.Employee msl
+On ms.Emp_Key = msl.emp_key
+GROUP BY prj.prj_idno
+       , prj.prj_name
+       , cli.Cli_Name
+       , MS.MS_ID
+       , MS.MS_Name
+	   ,ms.MS_BDCode
+       , pm.Emp_Initials 
+       , pic.Emp_Initials 
+       , msl.Emp_Initials 
+       , CASE WHEN @ReportType = 1 THEN PM.Emp_Key
+            WHEN @ReportType = 4 THEN MS.MS_Key END 
+     , CASE WHEN @ReportType = 1 THEN PM.Emp_Initials
+            WHEN @ReportType = 4 THEN MSL.Emp_Initials END 
+       , pm.Emp_Key
+       , CASE WHEN @ReportType = 1 THEN RTRIM(pm.Emp_LastName) + ', ' + RTRIM(pm.Emp_FirstName) + ' ' + RTRIM(pm.Emp_MiddleInitial) + '.'
+              WHEN @ReportType = 4 THEN RTRIM(msl.Emp_LastName) + ', ' + RTRIM(msl.Emp_FirstName) + ' ' + RTRIM(msl.Emp_MiddleInitial) + '. - ' + ms.MS_Name END
+HAVING CASE WHEN SUM(phs_totContract) - SUM(prj_totrev) &lt; 0 THEN 0 ELSE SUM(phs_totContract) - SUM(prj_totrev) END &gt;= 50
+
+/****** END Contracted Backlog *******/             
+UNION ALL
+
+/****** BEGIN Proposals ********/
+SELECT DISTINCT MSL.Emp_Initials AS MSL_Initials
+     , BD_Proposals.Prop_picinit AS PIC_Initials
+     , PM.Emp_Initials AS PM_Initials
+     , ms.MS_Name
+	 ,ms.MS_BDCode
+     , CASE WHEN @ReportType = 1 THEN pm.Emp_Key 
+            WHEN @ReportType = 4 THEN ms.MS_ID END AS FilterKey
+     , CASE WHEN @ReportType = 1 THEN RTRIM(pm.Emp_LastName) + ', ' + RTRIM(pm.Emp_FirstName) + ' ' + RTRIM(pm.Emp_MiddleInitial) + '.'
+            WHEN @ReportType = 4 THEN RTRIM(msl.Emp_LastName) + ', ' + RTRIM(msl.Emp_FirstName) + ' ' + RTRIM(msl.Emp_MiddleInitial) + '. - ' + ms.MS_Name END AS FilterDisplayName
+     , cli.Cli_Name
+     , NULL AS Prj_idno
+     , NULL AS Prj_Name
+     , NULL AS ContractAmt
+     , NULL AS phaserev
+     , NULL AS  RevenueAmt
+     , NULL AS BacklogAmt
+     , BD_Proposals.Prop_idno
+     , BD_Proposals.Prop_name
+     , BD_Proposals.Prop_pvalue
+     , BD_Proposals.Prop_rnk
+     , BD_Proposals.Prop_rnkvalue
+     , BD_Proposals.Prop_duedate
+     , BD_Proposals.Prop_submitdate
+     , BD_Proposals.Prop_nxtactivity
+     , BD_Proposals.Prop_winloss
+     , BD_Proposals.Prop_status
+	 , BD_Proposals.Prop_pvalue * BD_Proposals.Prop_rnkvalue AS Projected_Revenue
+	 , CASE WHEN (BD_Proposals.Prop_winloss IN ('W','L'))  AND ((BD_Proposals.Prop_winlossdate BETWEEN DATEADD(DD, - 14, GETDATE()) AND GETDATE())) THEN 0
+			ELSE BD_Proposals.Prop_pvalue * BD_Proposals.Prop_rnkvalue END AS Cur_Project_Revenue
+     , NULL AS Opp_idno
+     , NULL AS Opp_name
+     , NULL AS Opp_pvalue
+     , NULL AS Opp_rnk
+     , NULL AS Opp_rnkvalue
+     , NULL AS Opp_nxtactivity
+     , NULL AS Opp_creationdate
+	
+FROM Business_Development.dbo.BD_Proposals
+JOIN dbo.Employee PM 
+ON BD_Proposals.Prop_pm = PM.Emp_idno 
+LEFT JOIN Business_Development.dbo.BD_Clients cli
+ON BD_Proposals.Client_idno = cli.Cli_idno 
+LEFT JOIN MarketSegment ms
+ON cli.Cli_MktSeg = ms.MS_ID
+LEFT JOIN dbo.Employee MSL 
+ON ms.Emp_Key = MSL.emp_key 
+WHERE  (   ((BD_Proposals.Prop_winlossdate BETWEEN DATEADD(DD, - 14, GETDATE()) AND GETDATE())) 
+        OR ((BD_Proposals.Prop_winlossdate IS NULL) 
+        AND (BD_Proposals.Prop_status = 'A')) 
+       ) 
+AND ( 
+        (@ReportType = 1 AND PM.Emp_Key IN (SELECT Item FROM @FilterTable)) 
+     OR (@ReportType = 4 AND ms.MS_Key IN (SELECT Item FROM @FilterTable)) 
+    ) 
+/****** END Proposals ********/
+UNION ALL
+/****** BEGIN Opportunities ********/
+SELECT MSL.Emp_Initials AS MSL_Initials
+     , NULL AS PIC_Initials
+     , PM.Emp_Initials AS PM_Initials
+     , ms.MS_Name
+	 ,ms.MS_BDCode
+     , CASE WHEN @ReportType = 1 THEN pm.Emp_Key 
+            WHEN @ReportType = 4 THEN ms.MS_ID END AS FilterKey
+     , CASE WHEN @ReportType = 1 THEN RTRIM(pm.Emp_LastName) + ', ' + RTRIM(pm.Emp_FirstName) + ' ' + RTRIM(pm.Emp_MiddleInitial) + '.'
+            WHEN @ReportType = 4 THEN RTRIM(msl.Emp_LastName) + ', ' + RTRIM(msl.Emp_FirstName) + ' ' + RTRIM(msl.Emp_MiddleInitial) + '. - ' + ms.MS_Name END AS FilterDisplayName
+     , BD_Clients.Cli_Name
+     , NULL AS Prj_idno
+     , NULL AS Prj_Name
+     , NULL AS ContractAmt
+     , NULL AS phaserev
+     , NULL AS  RevenueAmt
+     , NULL AS BacklogAmt
+     , NULL AS Prop_idno
+     , NULL AS Prop_name
+     , NULL AS Prop_pvalue
+     , NULL AS Prop_rnk
+     , NULL AS Prop_rnkvalue
+     , NULL AS Prop_duedate
+     , NULL AS Prop_submitdate
+     , NULL AS Prop_nxtactivity
+     , NULL AS Prop_winloss
+     , NULL AS Prop_status
+	 , BD_Opportunity.Opp_pvalue * BD_Opportunity.Opp_rnkvalue AS Projected_Revenue
+     , BD_Opportunity.Opp_pvalue * BD_Opportunity.Opp_rnkvalue AS Cur_Project_Revenue
+     , BD_Opportunity.Opp_idno
+     , BD_Opportunity.Opp_name
+     , BD_Opportunity.Opp_pvalue
+     , BD_Opportunity.Opp_rnk
+     , BD_Opportunity.Opp_rnkvalue
+     , BD_Opportunity.Opp_nxtactivity
+     , BD_Opportunity.Opp_creationdate
+FROM Business_Development.dbo.BD_Opportunity 
+JOIN dbo.Employee PM 
+ON BD_Opportunity.Opp_pm = PM.Emp_idno 
+LEFT JOIN Business_Development.dbo.BD_Clients 
+ON BD_Opportunity.Client_idno = BD_Clients.Cli_idno 
+LEFT JOIN MarketSegment ms
+ON BD_Clients.Cli_MktSeg = ms.MS_ID
+LEFT JOIN dbo.Employee MSL 
+ON ms.Emp_Key = MSL.emp_key 
+WHERE     (BD_Opportunity.Opp_activeflg = 1) 
+AND (
+        (@ReportType = 1 AND PM.Emp_Key IN (SELECT Item FROM @FilterTable))
+     OR (@ReportType = 4 AND ms.MS_Key IN (SELECT Item FROM @FilterTable))
+    )
+/****** END Opportunities ********/</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="MSL_Initials">
+        <DataField>MSL_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Initials">
+        <DataField>PIC_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_Initials">
+        <DataField>PM_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MS_Name">
+        <DataField>MS_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MS_BDCode">
+        <DataField>MS_BDCode</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="FilterKey">
+        <DataField>FilterKey</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="FilterDisplayName">
+        <DataField>FilterDisplayName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cli_Name">
+        <DataField>Cli_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_idno">
+        <DataField>Prj_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Name">
+        <DataField>Prj_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="ContractAmt">
+        <DataField>ContractAmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="phaserev">
+        <DataField>phaserev</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="RevenueAmt">
+        <DataField>RevenueAmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="BacklogAmt">
+        <DataField>BacklogAmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Prop_idno">
+        <DataField>Prop_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prop_name">
+        <DataField>Prop_name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prop_pvalue">
+        <DataField>Prop_pvalue</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Prop_rnk">
+        <DataField>Prop_rnk</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prop_rnkvalue">
+        <DataField>Prop_rnkvalue</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Prop_duedate">
+        <DataField>Prop_duedate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Prop_submitdate">
+        <DataField>Prop_submitdate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Prop_nxtactivity">
+        <DataField>Prop_nxtactivity</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prop_winloss">
+        <DataField>Prop_winloss</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prop_status">
+        <DataField>Prop_status</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Projected_Revenue">
+        <DataField>Projected_Revenue</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Project_Revenue">
+        <DataField>Cur_Project_Revenue</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Opp_idno">
+        <DataField>Opp_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Opp_name">
+        <DataField>Opp_name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Opp_pvalue">
+        <DataField>Opp_pvalue</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Opp_rnk">
+        <DataField>Opp_rnk</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Opp_rnkvalue">
+        <DataField>Opp_rnkvalue</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Opp_nxtactivity">
+        <DataField>Opp_nxtactivity</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Opp_creationdate">
+        <DataField>Opp_creationdate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

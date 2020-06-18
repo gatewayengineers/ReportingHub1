@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <Description />
+  <DataSet Name="Projects_RAD_PM_Task_Summary">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+          <rd:IsMultiValued>true</rd:IsMultiValued>
+        </DataSetParameter>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Int32</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@CurrentUserEmpKey">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>SELECT prj.Prj_Idno AS Number
+     , prj.Prj_Name AS Name
+     , cli.Cli_Name
+     , PM.Emp_FirstName
+     , PM.Emp_MiddleInitial
+     , PM.Emp_LastName
+     , prjtsk.PrjTsk_DueDate
+     , prjtsk.PrjTsk_DueDate AS Due_Date
+     , prjtsk.PrjTsk_CompleteDate
+     , prjtsk.PrjTsk_CompleteFlg
+     , prjtsk.PrjTsk_Desc
+, prjtsk.PrjTsk_CreateDate
+     , PM.Emp_idno
+     , prjtsk.PrjTsk_CriticalFlg
+     , RTRIM(PM.Emp_CompanyUserName) AS Emp_CompanyUserName
+     , dbo.Emp_Name_By_Key(prj.PM_Key) AS PM_NAME
+     , dbo.Emp_Name_By_Key(prj.PIC_Key) AS PIC_NAME
+FROM dbo.Project prj
+JOIN dbo.Employee PM
+ON prj.PM_Key = PM.Emp_Key
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.ProjectTask prjtsk
+ON prj.Prj_Key = prjtsk.Prj_Key
+WHERE -- @ReportType = 1 -- Task Summary
+      (    @ReportType IN (1, 3)
+       AND prj.Prj_Status = 'A'
+       AND (   (prjtsk.PrjTsk_CompleteDate IS NULL) 
+            OR (prjtsk.PrjTsk_CompleteDate &gt; DATEADD(DD, - 10, GETDATE())))
+       AND (((PM.Emp_CompanyUserName IN (@FilterList)) AND @ReportType = 1)
+            OR (@ReportType = 3 AND prj.PIC_Key = @CurrentUserEmpKey)))
+      -- @ReportType = 2 -- Task History
+   OR (    @ReportType = 2
+       AND PM.Emp_CompanyUserName IN (@FilterList)
+      )</CommandText>
+      <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+    </Query>
+    <Fields>
+      <Field Name="Number">
+        <DataField>Number</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Name">
+        <DataField>Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cli_Name">
+        <DataField>Cli_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_FirstName">
+        <DataField>Emp_FirstName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_MiddleInitial">
+        <DataField>Emp_MiddleInitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_LastName">
+        <DataField>Emp_LastName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PrjTsk_DueDate">
+        <DataField>PrjTsk_DueDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Due_Date">
+        <DataField>Due_Date</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="PrjTsk_CompleteDate">
+        <DataField>PrjTsk_CompleteDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="PrjTsk_CompleteFlg">
+        <DataField>PrjTsk_CompleteFlg</DataField>
+        <rd:TypeName>System.Boolean</rd:TypeName>
+      </Field>
+      <Field Name="PrjTsk_Desc">
+        <DataField>PrjTsk_Desc</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PrjTsk_CreateDate">
+        <DataField>PrjTsk_CreateDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Emp_idno">
+        <DataField>Emp_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PrjTsk_CriticalFlg">
+        <DataField>PrjTsk_CriticalFlg</DataField>
+        <rd:TypeName>System.Boolean</rd:TypeName>
+      </Field>
+      <Field Name="Emp_CompanyUserName">
+        <DataField>Emp_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_NAME">
+        <DataField>PM_NAME</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_NAME">
+        <DataField>PIC_NAME</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

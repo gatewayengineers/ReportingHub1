@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>Ajera_Prod</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@StartDate">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>DateTime</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@EndDate">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>DateTime</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>SELECT Project.prjMainProjectDescription AS Prj_idno
+     , AxProject.prj_ProjectLongNameReq AS Prj_Name
+     , CAST(FLOOR(PM.vecE_EEID) AS nvarchar(3)) AS PM_idno
+     , Trans.tDate AS Tim_WrkDate
+     , CAST(AxEmployeeType.etNotes AS nvarchar(3)) AS Tim_Staff
+     , CAST(FLOOR(Employee.vecE_EEID) AS nvarchar(3)) AS Emp_idno
+     , Employee.vecLastName + ', ' + Employee.vecFirstName + ' ' + Employee.vecMiddleName + '.' AS EmployeeName
+     , Trans.tUnits AS Tim_WrkHrs
+     , Trans.tBilledRate AS Tim_BilRate
+     , Trans.tUnits * Trans.tBilledRate AS Tim_Total
+     , CAST(Trans.tNotes AS nvarchar(MAX)) AS Tim_Notes
+     , Trans.tBeginningBalanceType AS Tim_BegBalType
+     , Client.vecDescription AS ClientName, Client.vecC_ClientID AS Cli_idno
+     , AxProject.prj_ChevronRep AS PermittingContact
+     , AxProject.prj_ChevronOtherContact AS OtherContact
+     , AxProject.prj_WBSElementCostCenter AS Prj_WBSNo
+FROM       Trans 
+INNER JOIN Project 
+ON Project.prjKey = Trans.tMainProject 
+INNER JOIN AxProject 
+ON AxProject.prjKey = Trans.tMainProject 
+INNER JOIN AxEmployeeType 
+ON AxEmployeeType.etKey = Trans.tInvoiceEmployeeType 
+INNER JOIN AxVEC AS Employee 
+ON Employee.vecKey = Trans.tEmployee 
+INNER JOIN AxVEC AS PM 
+ON PM.vecKey = Project.prjProjectManager 
+INNER JOIN AxVEC AS Client 
+ON Client.vecKey = Project.prjClientKey
+WHERE (Trans.tEmployee IS NOT NULL) 
+AND (Trans.tType IN (0, 1, 2)) 
+AND (Trans.tBeginningBalanceType IN (0, 3)) 
+AND (Trans.tIsCurrent = 1) 
+AND (   Client.vecC_ClientID = 'CLI4546' 
+     OR Client.vecC_ClientID = 'CLI4173') 
+AND (Project.prjMainProjectDescription LIKE 'C-%') 
+AND (AxEmployeeType.etNotes NOT LIKE 'FH%')
+AND Trans.tDate BETWEEN @StartDate AND @EndDate</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Prj_idno">
+        <DataField>Prj_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Name">
+        <DataField>Prj_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_idno">
+        <DataField>PM_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Tim_WrkDate">
+        <DataField>Tim_WrkDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Tim_Staff">
+        <DataField>Tim_Staff</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_idno">
+        <DataField>Emp_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="EmployeeName">
+        <DataField>EmployeeName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Tim_WrkHrs">
+        <DataField>Tim_WrkHrs</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Tim_BilRate">
+        <DataField>Tim_BilRate</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Tim_Total">
+        <DataField>Tim_Total</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Tim_Notes">
+        <DataField>Tim_Notes</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Tim_BegBalType">
+        <DataField>Tim_BegBalType</DataField>
+        <rd:TypeName>System.Byte</rd:TypeName>
+      </Field>
+      <Field Name="ClientName">
+        <DataField>ClientName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cli_idno">
+        <DataField>Cli_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PermittingContact">
+        <DataField>PermittingContact</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="OtherContact">
+        <DataField>OtherContact</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_WBSNo">
+        <DataField>Prj_WBSNo</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

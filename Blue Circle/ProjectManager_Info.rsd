@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@OperationsReport">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@UserName">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>SELECT DISTINCT emp.emp_key
+     , emp.Emp_Idno
+     , emp.Emp_FirstName
+     , emp.Emp_LastName
+     , emp.Emp_MiddleInitial
+     , RTRIM(emp.Emp_CompanyUserName) AS Emp_CompanyUserName
+     , emp.Emp_Title
+     , emp.Emp_Supervisor
+     , emp.Emp_Initials
+     ,  dbo.Emp_Name_By_Key(emp.Emp_Key) as PM_Label
+,  dbo.Emp_Name_By_Key(emp.Emp_Key) as FirstLastName
+FROM dbo.Employee emp
+JOIN dbo.Project prj
+ON prj.pm_key = emp.emp_key
+WHERE (@OperationsReport = 1 OR @OperationsReport = 0 AND emp.Emp_CompanyUserName = @UserName)
+AND emp.Emp_Status = 'Y'
+AND prj.Prj_Type = 'D'
+AND prj.Prj_Status = 'A'
+ORDER BY emp.Emp_LastName
+         , emp.Emp_FirstName
+         , emp.Emp_MiddleInitial</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="emp_key">
+        <DataField>emp_key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Emp_FirstName">
+        <DataField>Emp_FirstName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_idno">
+        <DataField>Emp_Idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_LastName">
+        <DataField>Emp_LastName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_MiddleInitial">
+        <DataField>Emp_MiddleInitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_CompanyUserName">
+        <DataField>Emp_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Title">
+        <DataField>Emp_Title</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Supervisor">
+        <DataField>Emp_Supervisor</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Initials">
+        <DataField>Emp_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_Label">
+        <DataField>PM_Label</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="FirstLastName">
+        <DataField>FirstLastName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

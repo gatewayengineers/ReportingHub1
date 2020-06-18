@@ -1,0 +1,1560 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <Body>
+    <ReportItems>
+      <Tablix Name="Tablix1">
+        <TablixBody>
+          <TablixColumns>
+            <TablixColumn>
+              <Width>1in</Width>
+            </TablixColumn>
+            <TablixColumn>
+              <Width>1in</Width>
+            </TablixColumn>
+            <TablixColumn>
+              <Width>1in</Width>
+            </TablixColumn>
+          </TablixColumns>
+          <TablixRows>
+            <TablixRow>
+              <Height>0.25in</Height>
+              <TablixCells>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Textbox1">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value />
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox1</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Textbox3">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value />
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox3</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Textbox5">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value />
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox5</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+              </TablixCells>
+            </TablixRow>
+            <TablixRow>
+              <Height>0.25in</Height>
+              <TablixCells>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Textbox2">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!arInvoiceNumber.Value</Value>
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox2</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Textbox4">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value />
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox4</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="Textbox6">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value />
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox6</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+              </TablixCells>
+            </TablixRow>
+          </TablixRows>
+        </TablixBody>
+        <TablixColumnHierarchy>
+          <TablixMembers>
+            <TablixMember />
+            <TablixMember />
+            <TablixMember />
+          </TablixMembers>
+        </TablixColumnHierarchy>
+        <TablixRowHierarchy>
+          <TablixMembers>
+            <TablixMember>
+              <KeepWithGroup>After</KeepWithGroup>
+            </TablixMember>
+            <TablixMember>
+              <Group Name="Details" />
+            </TablixMember>
+          </TablixMembers>
+        </TablixRowHierarchy>
+        <DataSetName>DataSet2</DataSetName>
+        <Top>0.80083in</Top>
+        <Height>0.5in</Height>
+        <Width>3in</Width>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Tablix>
+    </ReportItems>
+    <Height>2in</Height>
+    <Style />
+  </Body>
+  <Width>6.5in</Width>
+  <Page>
+    <LeftMargin>1in</LeftMargin>
+    <RightMargin>1in</RightMargin>
+    <TopMargin>1in</TopMargin>
+    <BottomMargin>1in</BottomMargin>
+    <Style />
+  </Page>
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource1">
+      <DataSourceReference>Test_DB</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>ff221f7a-9d31-488a-a250-65747542cc27</rd:DataSourceID>
+    </DataSource>
+    <DataSource Name="DataSource2">
+      <DataSourceReference>Ajera_Reporting</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>423de29e-c92a-46bb-a25d-88cd126626dd</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet1">
+      <Query>
+        <DataSourceName>DataSource2</DataSourceName>
+        <CommandText>DECLARE    @CutoffCurrent      smalldatetime
+DECLARE    @Cutoff30           smalldatetime
+DECLARE    @Cutoff60           smalldatetime
+DECLARE    @Cutoff90           smalldatetime
+DECLARE    @Cutoff120          smalldatetime
+SET        @CutoffCurrent      = GETDATE()
+SET        @Cutoff30           = DATEADD(Day,-30,@CutoffCurrent)
+SET        @Cutoff60           = DATEADD(Day,-60,@CutoffCurrent)
+SET        @Cutoff90           = DATEADD(Day,-90,@CutoffCurrent)
+SET        @Cutoff120          = DATEADD(Day,-120,@CutoffCurrent)   
+
+SELECT 
+      arClientInvoiceKey      = ciKey
+  --   ,arInvoiceGroup          = ciInvoiceGroup
+  --   ,arInvoiceNumber         = ciInvoiceNumber
+  --   ,arInvoiceDate           = ciInvoiceDate
+	 --,vecDescription
+     --,arOutstanding           = ISNULL(SUM(zOutstanding)  ,0)  
+     --,arCurrent               = ISNULL(SUM(zAgingCurrent) ,0)
+     --,arAging3160             = ISNULL(SUM(zAging30)      ,0) 
+     --,arAging6190             = ISNULL(SUM(zAging60)      ,0) 
+     --,arAging91120            = ISNULL(SUM(zAging90)      ,0) 
+     --,arAging121              = ISNULL(SUM(zAging120)     ,0) 
+FROM(   
+   SELECT x.ciKey,x.ciInvoiceGroup,x.ciInvoiceNumber,x.ciInvoiceDate,vecDescription,
+       zOutstanding    = ISNULL(SUM(gldAmount),0)
+      ,zAgingCurrent   = ISNULL(CASE WHEN x.ciInvoiceDate &lt;= @CutoffCurrent AND x.ciInvoiceDate &gt; @Cutoff30    THEN ISNULL(SUM(gldAmount),0) END,0 )
+      ,zAging30        = ISNULL(CASE WHEN x.ciInvoiceDate &lt;= @Cutoff30      AND x.ciInvoiceDate &gt; @Cutoff60    THEN ISNULL(SUM(gldAmount),0) END,0 ) 
+      ,zAging60        = ISNULL(CASE WHEN x.ciInvoiceDate &lt;= @Cutoff60      AND x.ciInvoiceDate &gt; @Cutoff90    THEN ISNULL(SUM(gldAmount),0) END,0 ) 
+      ,zAging90        = ISNULL(CASE WHEN x.ciInvoiceDate &lt;= @Cutoff90      AND x.ciInvoiceDate &gt; @Cutoff120   THEN ISNULL(SUM(gldAmount),0) END,0 ) 
+      ,zAging120       = ISNULL(CASE WHEN x.ciInvoiceDate &lt;= @Cutoff120                                      THEN ISNULL(SUM(gldAmount),0) END,0 )
+   FROM Ajera_Snapshot.dbo.AxTransaction
+      LEFT JOIN Ajera_Snapshot.dbo.AxGLDetail       ON gldTransaction    = tKey
+      LEFT JOIN Ajera_Snapshot.dbo.AxClientInvoice x ON tClientInvoice    = ciKey
+	  LEFT JOIN Ajera_Snapshot.dbo.AxClientInvoice t on x.ciInvoiceGroup = t.ciInvoiceGroup
+	  Inner join Ajera_Snapshot.dbo.axvec on x.ciClient = veckey
+	  
+   WHERE 
+      gldControlAccountType = 2
+      AND
+      x.ciInvoiceDate IS NOT NULL
+      AND 
+      x.ciStatus = 4
+      --AND
+      --x.ciInvoiceType = (CASE @ifIncludeFinanceCharges WHEN 1 THEN x.ciInvoiceType WHEN 0 THEN 0 END)    
+      --AND
+      --ciInvoiceGroup In (@ciInvoiceGroup)
+   GROUP BY 
+      x.ciKey,x.ciInvoiceGroup,x.ciInvoiceNumber,x.ciInvoiceDate,vecDescription
+)SUB
+ GROUP BY 
+      ciKey,ciInvoiceGroup,ciInvoiceNumber,ciInvoiceDate,vecDescription
+HAVING 
+   --   ISNULL(SUM(zAgingCurrent),0)
+   --+  
+   ISNULL(SUM(zAging30     ),0)
+   +  ISNULL(SUM(zAging60     ),0)
+   +  ISNULL(SUM(zAging90     ),0)
+   +  ISNULL(SUM(zAging120    ),0)
+   &lt;&gt;0    
+ORDER BY ciKey</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="arClientInvoiceKey">
+          <DataField>arClientInvoiceKey</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="DataSet2">
+      <Query>
+        <DataSourceName>DataSource1</DataSourceName>
+        <QueryParameters>
+          <QueryParameter Name="@FilterList">
+            <Value>=JOIN(Parameters!FilterList.Value,",")</Value>
+          </QueryParameter>
+        </QueryParameters>
+        <CommandText>CREATE TABLE #TempGen (
+       gCompanyName                             varchar(2000)            DEFAULT ''
+      ,gCompanyAddress1                         varchar(80)             DEFAULT ''
+      ,gCompanyAddress2                         varchar(80)             DEFAULT ''
+      ,gCompanyAddress3                         varchar(80)             DEFAULT ''
+      ,gCompanyCity                             varchar(80)             DEFAULT ''
+      ,gCompanyState                            varchar(80)             DEFAULT ''
+      ,gCompanyZip                              varchar(80)             DEFAULT ''
+      ,gCompanyCityStateZip                     varchar(300)            DEFAULT ''
+      ,gCompanyMailingLine1                     varchar(300)            DEFAULT ''
+      ,gCompanyMailingLine2                     varchar(300)            DEFAULT ''
+      ,gCompanyMailingLine3                     varchar(300)            DEFAULT ''
+      ,gCompanyMailingLine4                     varchar(300)            DEFAULT ''
+      ,gCompanyMailingLine5                     varchar(300)            DEFAULT ''
+      ,gCompanyMailingLine6                     varchar(300)            DEFAULT ''      
+      ,gCompanyMailingLine1IsBold               bit                     DEFAULT ''
+      ,gCompanyMailingLine2IsBold               bit                     DEFAULT ''
+      ,gCompanyMailingLine3IsBold               bit                     DEFAULT ''
+      ,gCompanyMailingLine4IsBold               bit                     DEFAULT ''
+      ,gCompanyMailingLine5IsBold               bit                     DEFAULT ''
+      ,gCompanyMailingLine6IsBold               bit                     DEFAULT ''      
+      ,gCompanyCountry                          varchar(30)             DEFAULT ''
+      ,gCompanyPhone1                           varchar(30)             DEFAULT ''
+      ,gCompanyPhone1Text                       varchar(80)             DEFAULT ''
+      ,gCompanyPhone2                           varchar(30)             DEFAULT ''
+      ,gCompanyPhone2Text                       varchar(80)             DEFAULT ''
+      ,gCompanyPhone3                           varchar(30)             DEFAULT ''
+      ,gCompanyPhone3Text                       varchar(80)             DEFAULT ''
+      ,gCompanyFax                              varchar(30)             DEFAULT ''
+      ,gCompanyFaxText                          varchar(80)             DEFAULT ''
+      ,gCompanyEmail                            varchar(100)            DEFAULT ''
+      ,gCompanyWebsite                          varchar(100)            DEFAULT ''
+      ,gPhaseDescription                        varchar(10)             DEFAULT ''
+      ,gActivityDescription                     varchar(10)             DEFAULT ''
+      ,gClientKey                               int                     DEFAULT 0
+      ,gClientName                              varchar(2000)            DEFAULT ''
+      ,gClientAddress1                          varchar(80)             DEFAULT ''
+      ,gClientAddress2                          varchar(80)             DEFAULT ''
+      ,gClientAddress3                          varchar(80)             DEFAULT ''
+      ,gClientCity                              varchar(80)             DEFAULT ''
+      ,gClientState                             varchar(80)             DEFAULT ''
+      ,gClientZip                               varchar(80)             DEFAULT ''
+      ,gClientCityStateZip                      varchar(300)            DEFAULT ''
+      ,gClientMailingLine1                      varchar(300)            DEFAULT ''
+      ,gClientMailingLine2                      varchar(300)            DEFAULT ''
+      ,gClientMailingLine3                      varchar(300)            DEFAULT ''
+      ,gClientMailingLine4                      varchar(300)            DEFAULT ''
+      ,gClientMailingLine5                      varchar(300)            DEFAULT ''
+      ,gClientMailingLine6                      varchar(300)            DEFAULT ''
+      ,gClientCountry                           varchar(30)             DEFAULT ''
+      ,gClientPhone1                            varchar(30)             DEFAULT ''
+      ,gClientPhone1Text                        varchar(80)             DEFAULT ''
+      ,gClientPhone2                            varchar(30)             DEFAULT ''
+      ,gClientPhone2Text                        varchar(80)             DEFAULT ''
+      ,gClientPhone3                            varchar(30)             DEFAULT ''
+      ,gClientPhone3Text                        varchar(80)             DEFAULT ''
+      ,gClientFax                               varchar(30)             DEFAULT ''
+      ,gClientFaxText                           varchar(80)             DEFAULT ''
+      ,gClientEmail                             varchar(100)            DEFAULT ''
+      ,gClientWebsite                           varchar(100)            DEFAULT ''
+      ,gProjectKey                              int                     DEFAULT 0
+      ,gProjectID                               varchar(80)             DEFAULT ''
+      ,gProjectDescription                      varchar(2000)            DEFAULT ''
+      ,gProjectConstructionCost                 decimal(19,2)           DEFAULT 0
+      ,gProjectPercentOfConstructionCost        decimal(19,4)           DEFAULT 0
+      ,gProjectNotes                            text                    DEFAULT ''
+      ,gProjectLocation                         text                    DEFAULT ''
+      ,gProjectTaxCode                          varchar(20)             DEFAULT ''
+      ,gScopeOfWork                             text                    DEFAULT ''
+      ,gHeaderText                              text                    DEFAULT ''
+      ,gFooterText                              text                    DEFAULT ''
+      ,gInvoiceSummaryHeading                   text                    DEFAULT ''
+      ,gRegularHoursDescription                 varchar(80)             DEFAULT ''
+      ,gPremiumHours1Description                varchar(80)             DEFAULT ''
+      ,gPremiumHours2Description                varchar(80)             DEFAULT ''
+      ,gPremiumHours3Description                varchar(80)             DEFAULT ''
+      ,gProjectManager                          int                     DEFAULT 0
+      ,gProjectManagerName                      varchar(2000)            DEFAULT ''
+      ,gProjectManagerTitle                     varchar(40)             DEFAULT ''
+      ,gPrincipalInCharge                       int                     DEFAULT 0
+      ,gPrincipalInChargeName                   varchar(2000)            DEFAULT ''
+      ,gPrincipalInChargeTitle                  varchar(40)             DEFAULT ''
+      ,gBillingManager                          int                     DEFAULT 0
+      ,gBillingManagerName                      varchar(2000)            DEFAULT ''
+      ,gBillingManagerTitle                     varchar(2000)            DEFAULT ''
+      ,gClientBillingContact                    int                     DEFAULT 0
+      ,gClientBillingContactName                varchar(2000)            DEFAULT ''
+      ,gClientBillingContactCompany             varchar(2000)            DEFAULT ''
+      ,gClientBillingContactTitle               varchar(2000)            DEFAULT ''
+      ,gClientBillingContactPhone1              varchar(40)             DEFAULT ''
+      ,gClientBillingContactEmail               varchar(100)            DEFAULT ''
+      ,gToday                                   smalldatetime
+      ,gInvoiceKey                              int                     DEFAULT 0
+      ,gInvoiceGroupKey                         int                     DEFAULT 0
+      ,gInvoiceStatus                           int                     DEFAULT 0
+      ,gInvoiceStatusDescription                varchar(100)            DEFAULT ''      
+      ,gInvoiceGroupNotes                       text                    DEFAULT ''
+      ,gInvoiceNotes                            text                    DEFAULT ''
+      ,gInvoiceNumber                           varchar(100)            DEFAULT ''
+      ,gInvoiceDate                             smalldatetime   
+      ,gInvoiceCutoffDate                       smalldatetime
+      ,gInvoiceLastCutoffDate                   smalldatetime
+      ,gInvoiceLastInvoiceNumber                varchar(100)            DEFAULT ''
+      ,gInvoiceLastInvoiceDate                  smalldatetime           
+      ,gInvoiceSubTotal                         decimal(19,2)           DEFAULT 0
+      ,gInvoiceAdjustment                       decimal(19,2)           DEFAULT 0
+      ,gInvoiceAdjustmentNotes                  text                    DEFAULT ''
+      ,gInvoiceSalesTax                         decimal(19,2)           DEFAULT 0
+      ,gInvoiceTETotal                          decimal(19,2)           DEFAULT 0
+      ,gInvoiceFeeTotal                         decimal(19,2)           DEFAULT 0
+      ,gInvoiceTotal                            decimal(19,2)           DEFAULT 0
+      ,gInvoicePrepaymentApplied                decimal(19,2)           DEFAULT 0
+      ,gInvoiceProjectPrepaymentBalance         decimal(19,2)           DEFAULT 0
+      ,gInvoiceClientPrepaymentBalance          decimal(19,2)           DEFAULT 0
+      ,gInvoiceOverBudget                       bit                     DEFAULT 0
+      
+      ,gInvoiceGroupReceipt                     decimal(19,2)           DEFAULT 0
+      ,gInvoiceGroupLaborReceipt                decimal(19,2)           DEFAULT 0
+      ,gInvoiceGroupExpenseReceipt              decimal(19,2)           DEFAULT 0
+      ,gInvoiceGroupConsultantReceipt           decimal(19,2)           DEFAULT 0
+      ,gInvoiceGroupAdjustmentReceipt           decimal(19,2)           DEFAULT 0
+      ,gInvoiceGroupSalesTaxReceipt             decimal(19,2)           DEFAULT 0
+      ,gInvoiceGroupPrepaymentReceipt           decimal(19,2)           DEFAULT 0
+      ,gInvoiceGroupReceivableBalance           decimal(19,2)           DEFAULT 0
+
+      ,ifSummaryHeading                         varchar(30)
+      ,ifSummarySeparateTE                      bit
+      ,ifSupportDraft                           bit                     DEFAULT 0
+      ,ifSupportDraftHeading                    varchar(80)             DEFAULT ''
+      ,ifSupportDraftNotes                      bit                     DEFAULT 0
+      ,ifSupportDraftPhaseSummary               bit                     DEFAULT 0
+      ,ifSupportDraftWIPPhasesOnly              bit                     DEFAULT 0
+      ,ifSupportDraftIncludeMarketing           bit                     DEFAULT 0
+      ,ifSupportFinal                           bit                     DEFAULT 0
+      ,ifSupportFinalHeading                    varchar(80)             DEFAULT ''
+      ,ifSupportFinalNotes                      bit                     DEFAULT 0
+      ,ifSupportFinalPhaseSummary               bit                     DEFAULT 0
+      ,ifSupportFinalWIPPhasesOnly              bit                     DEFAULT 0
+      ,ifSupportFinalIncludeMarketing           bit                     DEFAULT 0
+      ,ifTimesheetsDraft                        bit                     DEFAULT 0
+      ,ifTimesheetsDraftID                      bit                     DEFAULT 0
+      ,ifTimesheetsDraftApprovalBlock           bit                     DEFAULT 0
+      ,ifTimesheetsDraftEmployeeLine            bit                     DEFAULT 0
+      ,ifTimesheetsDraftSupervisorLine          bit                     DEFAULT 0
+      ,ifTimesheetsFinal                        bit                     DEFAULT 0
+      ,ifTimesheetsFinalID                      bit                     DEFAULT 0
+      ,ifTimesheetsFinalApprovalBlock           bit                     DEFAULT 0
+      ,ifTimesheetsFinalEmployeeLine            bit                     DEFAULT 0
+      ,ifTimesheetsFinalSupervisorLine          bit                     DEFAULT 0
+
+   )
+Create Table #TempAR
+(arClientInvoiceKey Int,
+	arInvoiceGroup INT,
+	arInvoiceNumber varchar(255),
+	arInvoiceDate date,
+	arOutstanding decimal(38,2),
+	arCurrent decimal(38,2),
+	arAging3160 decimal(38,2),
+	arAging6190 decimal(38,2),
+	arAging91120 decimal(38,2),
+	arAging121 decimal(38,2)
+	)
+
+CREATE TABLE #TempTimesheet (
+
+       tsTransactionKey                     int             NOT NULL    DEFAULT 0        
+      ,tsTimesheetKey                       int             NOT NULL    DEFAULT 0
+      ,tsRow                                int             NOT NULL    DEFAULT 0 
+      ,tsHoursType                          int             NOT NULL    DEFAULT 0
+      ,tsTimesheetOverheadGroupDetail       int             NOT NULL    DEFAULT 0
+      ,tsWorkDate                           smalldatetime   
+      ,tsTimesheetDate                      smalldatetime
+      ,tsProject                            int             NOT NULL    DEFAULT 0
+      ,tsProjectID                          varchar(100)    NOT NULL    DEFAULT ''
+      ,tsProjectDescription                 varchar(400)    NOT NULL    DEFAULT ''
+      ,tsPhase                              int             NOT NULL    DEFAULT 0
+      ,tsPhaseOrder                         int             NOT NULL    DEFAULT 0
+      ,tsPhaseID                            varchar(100)    NOT NULL    DEFAULT ''
+      ,tsPhaseDescription                   varchar(400)    NOT NULL    DEFAULT ''
+      ,tsPhaseIDDescription                 varchar(800)    NOT NULL    DEFAULT ''
+      ,tsActivity                           int             NOT NULL    DEFAULT 0
+      ,tsActivityOrder                      int             NOT NULL    DEFAULT 0
+      ,tsActivityDescription                varchar(100)    NOT NULL    DEFAULT ''
+      ,tsEmployee                           int             NOT NULL    DEFAULT 0
+      ,tsEmployeeName                       varchar(100)    NOT NULL    DEFAULT ''
+      ,tsEmployeeType                       int             NOT NULL    DEFAULT 0
+      ,tsEmployeeTypeOrder                  int             NOT NULL    DEFAULT 0
+      ,tsEmployeeTypeDescription            varchar(100)    NOT NULL    DEFAULT ''
+      ,tsIsOverhead                         bit             NOT NULL    DEFAULT 0
+      ,tsOverheadGroup                      int             NOT NULL    DEFAULT 0
+      ,tsOverheadGroupDescription           varchar(100)    NOT NULL    DEFAULT ''
+      ,tsSubmittedByName                    varchar(100)    NOT NULL    DEFAULT '' 
+      ,tsSubmittedByDate                    smalldatetime 
+      ,tsSupervisorApprovedByName           varchar(100)    NOT NULL    DEFAULT ''
+      ,tsSupervisorApprovedDate             smalldatetime 
+      ,tsAccountingApprovedByName           varchar(100)    NOT NULL    DEFAULT ''
+      ,tsAccountingApprovedDate             smalldatetime 
+      ,tsEmployeeBillablePercent            decimal(19,2)   NOT NULL    DEFAULT 0
+      ,tsHasNotes                           bit             NOT NULL    DEFAULT 0
+      ,tsClientInvoiceStatus                int             NOT NULL    DEFAULT 0
+      ,tsClientInvoiceStatusDescription     varchar(100)    NOT NULL    DEFAULT ''
+      
+      ,tsDay1                               decimal(19,2)   NOT NULL    DEFAULT 0
+      ,tsDay2                               decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsDay3                               decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsDay4                               decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsDay5                               decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsDay6                               decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsDay7                               decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsTotal                              decimal(19,2)   NOT NULL    DEFAULT 0 
+                          
+      ,tsHoursType0_1                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType0_2                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType0_3                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType0_4                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType0_5                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType0_6                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType0_7                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType0_Total                   decimal(19,2)   NOT NULL    DEFAULT 0 
+
+      ,tsHoursType1_1                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType1_2                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType1_3                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType1_4                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType1_5                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType1_6                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType1_7                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType1_Total                   decimal(19,2)   NOT NULL    DEFAULT 0 
+
+      ,tsHoursType2_1                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType2_2                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType2_3                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType2_4                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType2_5                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType2_6                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType2_7                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType2_Total                   decimal(19,2)   NOT NULL    DEFAULT 0 
+
+      ,tsHoursType3_1                       decimal(19,2)   NOT NULL    DEFAULT 0
+      ,tsHoursType3_2                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType3_3                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType3_4                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType3_5                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType3_6                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType3_7                       decimal(19,2)   NOT NULL    DEFAULT 0 
+      ,tsHoursType3_Total                   decimal(19,2)   NOT NULL    DEFAULT 0 
+      
+)
+
+
+INSERT INTO #TempAR
+EXEC AxRDLInvoices_AccountsReceivable @FilterList
+INSERT INTO #TempGen
+EXEC AxRDLInvoices_General @FilterList
+INSERT INTO #TempTimesheet
+EXEC AxRDLInvoices_Timesheet @FilterList
+
+SELECT * FROM #TempAR ar 
+Inner Join #TempGen gen 
+on ar.arClientInvoiceKey = gen.gInvoiceKey
+Inner Join #TempTimesheet ts
+on gen.gProjectKey = ts.tsProject
+
+DROP TABLE #TempAR
+DROP TABLE #TempTimesheet
+DROP TABLE #TempGen</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="arClientInvoiceKey">
+          <DataField>arClientInvoiceKey</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="arInvoiceGroup">
+          <DataField>arInvoiceGroup</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="arInvoiceNumber">
+          <DataField>arInvoiceNumber</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="arInvoiceDate">
+          <DataField>arInvoiceDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="arOutstanding">
+          <DataField>arOutstanding</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="arCurrent">
+          <DataField>arCurrent</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="arAging3160">
+          <DataField>arAging3160</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="arAging6190">
+          <DataField>arAging6190</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="arAging91120">
+          <DataField>arAging91120</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="arAging121">
+          <DataField>arAging121</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyName">
+          <DataField>gCompanyName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyAddress1">
+          <DataField>gCompanyAddress1</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyAddress2">
+          <DataField>gCompanyAddress2</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyAddress3">
+          <DataField>gCompanyAddress3</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyCity">
+          <DataField>gCompanyCity</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyState">
+          <DataField>gCompanyState</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyZip">
+          <DataField>gCompanyZip</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyCityStateZip">
+          <DataField>gCompanyCityStateZip</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine1">
+          <DataField>gCompanyMailingLine1</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine2">
+          <DataField>gCompanyMailingLine2</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine3">
+          <DataField>gCompanyMailingLine3</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine4">
+          <DataField>gCompanyMailingLine4</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine5">
+          <DataField>gCompanyMailingLine5</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine6">
+          <DataField>gCompanyMailingLine6</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine1IsBold">
+          <DataField>gCompanyMailingLine1IsBold</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine2IsBold">
+          <DataField>gCompanyMailingLine2IsBold</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine3IsBold">
+          <DataField>gCompanyMailingLine3IsBold</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine4IsBold">
+          <DataField>gCompanyMailingLine4IsBold</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine5IsBold">
+          <DataField>gCompanyMailingLine5IsBold</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyMailingLine6IsBold">
+          <DataField>gCompanyMailingLine6IsBold</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyCountry">
+          <DataField>gCompanyCountry</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyPhone1">
+          <DataField>gCompanyPhone1</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyPhone1Text">
+          <DataField>gCompanyPhone1Text</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyPhone2">
+          <DataField>gCompanyPhone2</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyPhone2Text">
+          <DataField>gCompanyPhone2Text</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyPhone3">
+          <DataField>gCompanyPhone3</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyPhone3Text">
+          <DataField>gCompanyPhone3Text</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyFax">
+          <DataField>gCompanyFax</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyFaxText">
+          <DataField>gCompanyFaxText</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyEmail">
+          <DataField>gCompanyEmail</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gCompanyWebsite">
+          <DataField>gCompanyWebsite</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gPhaseDescription">
+          <DataField>gPhaseDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gActivityDescription">
+          <DataField>gActivityDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientKey">
+          <DataField>gClientKey</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="gClientName">
+          <DataField>gClientName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientAddress1">
+          <DataField>gClientAddress1</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientAddress2">
+          <DataField>gClientAddress2</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientAddress3">
+          <DataField>gClientAddress3</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientCity">
+          <DataField>gClientCity</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientState">
+          <DataField>gClientState</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientZip">
+          <DataField>gClientZip</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientCityStateZip">
+          <DataField>gClientCityStateZip</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientMailingLine1">
+          <DataField>gClientMailingLine1</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientMailingLine2">
+          <DataField>gClientMailingLine2</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientMailingLine3">
+          <DataField>gClientMailingLine3</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientMailingLine4">
+          <DataField>gClientMailingLine4</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientMailingLine5">
+          <DataField>gClientMailingLine5</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientMailingLine6">
+          <DataField>gClientMailingLine6</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientCountry">
+          <DataField>gClientCountry</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientPhone1">
+          <DataField>gClientPhone1</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientPhone1Text">
+          <DataField>gClientPhone1Text</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientPhone2">
+          <DataField>gClientPhone2</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientPhone2Text">
+          <DataField>gClientPhone2Text</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientPhone3">
+          <DataField>gClientPhone3</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientPhone3Text">
+          <DataField>gClientPhone3Text</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientFax">
+          <DataField>gClientFax</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientFaxText">
+          <DataField>gClientFaxText</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientEmail">
+          <DataField>gClientEmail</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientWebsite">
+          <DataField>gClientWebsite</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gProjectKey">
+          <DataField>gProjectKey</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="gProjectID">
+          <DataField>gProjectID</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gProjectDescription">
+          <DataField>gProjectDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gProjectConstructionCost">
+          <DataField>gProjectConstructionCost</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gProjectPercentOfConstructionCost">
+          <DataField>gProjectPercentOfConstructionCost</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gProjectNotes">
+          <DataField>gProjectNotes</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gProjectLocation">
+          <DataField>gProjectLocation</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gProjectTaxCode">
+          <DataField>gProjectTaxCode</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gScopeOfWork">
+          <DataField>gScopeOfWork</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gHeaderText">
+          <DataField>gHeaderText</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gFooterText">
+          <DataField>gFooterText</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceSummaryHeading">
+          <DataField>gInvoiceSummaryHeading</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gRegularHoursDescription">
+          <DataField>gRegularHoursDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gPremiumHours1Description">
+          <DataField>gPremiumHours1Description</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gPremiumHours2Description">
+          <DataField>gPremiumHours2Description</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gPremiumHours3Description">
+          <DataField>gPremiumHours3Description</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gProjectManager">
+          <DataField>gProjectManager</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="gProjectManagerName">
+          <DataField>gProjectManagerName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gProjectManagerTitle">
+          <DataField>gProjectManagerTitle</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gPrincipalInCharge">
+          <DataField>gPrincipalInCharge</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="gPrincipalInChargeName">
+          <DataField>gPrincipalInChargeName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gPrincipalInChargeTitle">
+          <DataField>gPrincipalInChargeTitle</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gBillingManager">
+          <DataField>gBillingManager</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="gBillingManagerName">
+          <DataField>gBillingManagerName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gBillingManagerTitle">
+          <DataField>gBillingManagerTitle</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientBillingContact">
+          <DataField>gClientBillingContact</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="gClientBillingContactName">
+          <DataField>gClientBillingContactName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientBillingContactCompany">
+          <DataField>gClientBillingContactCompany</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientBillingContactTitle">
+          <DataField>gClientBillingContactTitle</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientBillingContactPhone1">
+          <DataField>gClientBillingContactPhone1</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gClientBillingContactEmail">
+          <DataField>gClientBillingContactEmail</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gToday">
+          <DataField>gToday</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceKey">
+          <DataField>gInvoiceKey</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupKey">
+          <DataField>gInvoiceGroupKey</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceStatus">
+          <DataField>gInvoiceStatus</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceStatusDescription">
+          <DataField>gInvoiceStatusDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupNotes">
+          <DataField>gInvoiceGroupNotes</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceNotes">
+          <DataField>gInvoiceNotes</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceNumber">
+          <DataField>gInvoiceNumber</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceDate">
+          <DataField>gInvoiceDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceCutoffDate">
+          <DataField>gInvoiceCutoffDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceLastCutoffDate">
+          <DataField>gInvoiceLastCutoffDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceLastInvoiceNumber">
+          <DataField>gInvoiceLastInvoiceNumber</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceLastInvoiceDate">
+          <DataField>gInvoiceLastInvoiceDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceSubTotal">
+          <DataField>gInvoiceSubTotal</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceAdjustment">
+          <DataField>gInvoiceAdjustment</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceAdjustmentNotes">
+          <DataField>gInvoiceAdjustmentNotes</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceSalesTax">
+          <DataField>gInvoiceSalesTax</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceTETotal">
+          <DataField>gInvoiceTETotal</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceFeeTotal">
+          <DataField>gInvoiceFeeTotal</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceTotal">
+          <DataField>gInvoiceTotal</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoicePrepaymentApplied">
+          <DataField>gInvoicePrepaymentApplied</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceProjectPrepaymentBalance">
+          <DataField>gInvoiceProjectPrepaymentBalance</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceClientPrepaymentBalance">
+          <DataField>gInvoiceClientPrepaymentBalance</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceOverBudget">
+          <DataField>gInvoiceOverBudget</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupReceipt">
+          <DataField>gInvoiceGroupReceipt</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupLaborReceipt">
+          <DataField>gInvoiceGroupLaborReceipt</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupExpenseReceipt">
+          <DataField>gInvoiceGroupExpenseReceipt</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupConsultantReceipt">
+          <DataField>gInvoiceGroupConsultantReceipt</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupAdjustmentReceipt">
+          <DataField>gInvoiceGroupAdjustmentReceipt</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupSalesTaxReceipt">
+          <DataField>gInvoiceGroupSalesTaxReceipt</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupPrepaymentReceipt">
+          <DataField>gInvoiceGroupPrepaymentReceipt</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="gInvoiceGroupReceivableBalance">
+          <DataField>gInvoiceGroupReceivableBalance</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="ifSummaryHeading">
+          <DataField>ifSummaryHeading</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ifSummarySeparateTE">
+          <DataField>ifSummarySeparateTE</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportDraft">
+          <DataField>ifSupportDraft</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportDraftHeading">
+          <DataField>ifSupportDraftHeading</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportDraftNotes">
+          <DataField>ifSupportDraftNotes</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportDraftPhaseSummary">
+          <DataField>ifSupportDraftPhaseSummary</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportDraftWIPPhasesOnly">
+          <DataField>ifSupportDraftWIPPhasesOnly</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportDraftIncludeMarketing">
+          <DataField>ifSupportDraftIncludeMarketing</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportFinal">
+          <DataField>ifSupportFinal</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportFinalHeading">
+          <DataField>ifSupportFinalHeading</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportFinalNotes">
+          <DataField>ifSupportFinalNotes</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportFinalPhaseSummary">
+          <DataField>ifSupportFinalPhaseSummary</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportFinalWIPPhasesOnly">
+          <DataField>ifSupportFinalWIPPhasesOnly</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifSupportFinalIncludeMarketing">
+          <DataField>ifSupportFinalIncludeMarketing</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsDraft">
+          <DataField>ifTimesheetsDraft</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsDraftID">
+          <DataField>ifTimesheetsDraftID</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsDraftApprovalBlock">
+          <DataField>ifTimesheetsDraftApprovalBlock</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsDraftEmployeeLine">
+          <DataField>ifTimesheetsDraftEmployeeLine</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsDraftSupervisorLine">
+          <DataField>ifTimesheetsDraftSupervisorLine</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsFinal">
+          <DataField>ifTimesheetsFinal</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsFinalID">
+          <DataField>ifTimesheetsFinalID</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsFinalApprovalBlock">
+          <DataField>ifTimesheetsFinalApprovalBlock</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsFinalEmployeeLine">
+          <DataField>ifTimesheetsFinalEmployeeLine</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="ifTimesheetsFinalSupervisorLine">
+          <DataField>ifTimesheetsFinalSupervisorLine</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="tsTransactionKey">
+          <DataField>tsTransactionKey</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsTimesheetKey">
+          <DataField>tsTimesheetKey</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsRow">
+          <DataField>tsRow</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType">
+          <DataField>tsHoursType</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsTimesheetOverheadGroupDetail">
+          <DataField>tsTimesheetOverheadGroupDetail</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsWorkDate">
+          <DataField>tsWorkDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="tsTimesheetDate">
+          <DataField>tsTimesheetDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="tsProject">
+          <DataField>tsProject</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsProjectID">
+          <DataField>tsProjectID</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsProjectDescription">
+          <DataField>tsProjectDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsPhase">
+          <DataField>tsPhase</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsPhaseOrder">
+          <DataField>tsPhaseOrder</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsPhaseID">
+          <DataField>tsPhaseID</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsPhaseDescription">
+          <DataField>tsPhaseDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsPhaseIDDescription">
+          <DataField>tsPhaseIDDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsActivity">
+          <DataField>tsActivity</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsActivityOrder">
+          <DataField>tsActivityOrder</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsActivityDescription">
+          <DataField>tsActivityDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsEmployee">
+          <DataField>tsEmployee</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsEmployeeName">
+          <DataField>tsEmployeeName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsEmployeeType">
+          <DataField>tsEmployeeType</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsEmployeeTypeOrder">
+          <DataField>tsEmployeeTypeOrder</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsEmployeeTypeDescription">
+          <DataField>tsEmployeeTypeDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsIsOverhead">
+          <DataField>tsIsOverhead</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="tsOverheadGroup">
+          <DataField>tsOverheadGroup</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsOverheadGroupDescription">
+          <DataField>tsOverheadGroupDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsSubmittedByName">
+          <DataField>tsSubmittedByName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsSubmittedByDate">
+          <DataField>tsSubmittedByDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="tsSupervisorApprovedByName">
+          <DataField>tsSupervisorApprovedByName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsSupervisorApprovedDate">
+          <DataField>tsSupervisorApprovedDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="tsAccountingApprovedByName">
+          <DataField>tsAccountingApprovedByName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsAccountingApprovedDate">
+          <DataField>tsAccountingApprovedDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="tsEmployeeBillablePercent">
+          <DataField>tsEmployeeBillablePercent</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHasNotes">
+          <DataField>tsHasNotes</DataField>
+          <rd:TypeName>System.Boolean</rd:TypeName>
+        </Field>
+        <Field Name="tsClientInvoiceStatus">
+          <DataField>tsClientInvoiceStatus</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="tsClientInvoiceStatusDescription">
+          <DataField>tsClientInvoiceStatusDescription</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="tsDay1">
+          <DataField>tsDay1</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsDay2">
+          <DataField>tsDay2</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsDay3">
+          <DataField>tsDay3</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsDay4">
+          <DataField>tsDay4</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsDay5">
+          <DataField>tsDay5</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsDay6">
+          <DataField>tsDay6</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsDay7">
+          <DataField>tsDay7</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsTotal">
+          <DataField>tsTotal</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType0_1">
+          <DataField>tsHoursType0_1</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType0_2">
+          <DataField>tsHoursType0_2</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType0_3">
+          <DataField>tsHoursType0_3</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType0_4">
+          <DataField>tsHoursType0_4</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType0_5">
+          <DataField>tsHoursType0_5</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType0_6">
+          <DataField>tsHoursType0_6</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType0_7">
+          <DataField>tsHoursType0_7</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType0_Total">
+          <DataField>tsHoursType0_Total</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType1_1">
+          <DataField>tsHoursType1_1</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType1_2">
+          <DataField>tsHoursType1_2</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType1_3">
+          <DataField>tsHoursType1_3</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType1_4">
+          <DataField>tsHoursType1_4</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType1_5">
+          <DataField>tsHoursType1_5</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType1_6">
+          <DataField>tsHoursType1_6</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType1_7">
+          <DataField>tsHoursType1_7</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType1_Total">
+          <DataField>tsHoursType1_Total</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType2_1">
+          <DataField>tsHoursType2_1</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType2_2">
+          <DataField>tsHoursType2_2</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType2_3">
+          <DataField>tsHoursType2_3</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType2_4">
+          <DataField>tsHoursType2_4</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType2_5">
+          <DataField>tsHoursType2_5</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType2_6">
+          <DataField>tsHoursType2_6</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType2_7">
+          <DataField>tsHoursType2_7</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType2_Total">
+          <DataField>tsHoursType2_Total</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType3_1">
+          <DataField>tsHoursType3_1</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType3_2">
+          <DataField>tsHoursType3_2</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType3_3">
+          <DataField>tsHoursType3_3</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType3_4">
+          <DataField>tsHoursType3_4</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType3_5">
+          <DataField>tsHoursType3_5</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType3_6">
+          <DataField>tsHoursType3_6</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType3_7">
+          <DataField>tsHoursType3_7</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+        <Field Name="tsHoursType3_Total">
+          <DataField>tsHoursType3_Total</DataField>
+          <rd:TypeName>System.Decimal</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+  <ReportParameters>
+    <ReportParameter Name="FilterList">
+      <DataType>String</DataType>
+      <Prompt>Filter List</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>DataSet1</DataSetName>
+          <ValueField>arClientInvoiceKey</ValueField>
+          <LabelField>arClientInvoiceKey</LabelField>
+        </DataSetReference>
+      </ValidValues>
+      <MultiValue>true</MultiValue>
+    </ReportParameter>
+  </ReportParameters>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>1f1e278e-b25c-41b7-b355-bbabe688c376</rd:ReportID>
+</Report>

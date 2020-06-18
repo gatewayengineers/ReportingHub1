@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>DECLARE @LTMData TABLE (DataType VARCHAR(50), MktSegLbl VARCHAR(50), Emp_Name VARCHAR(50), DataValue DECIMAL(19,2))
+
+
+
+; WITH BDs AS (SELECT 2 AS MS_Key, 'BD-01' AS MS_BDCode, 'Commercial' AS MS_Name
+UNION ALL
+SELECT 3 AS MS_Key, 'BD-02' AS MS_BDCode, 'Consultants' AS MS_Name
+UNION ALL
+SELECT 5 AS MS_Key, 'BD-03' AS MS_BDCode, 'Contractors' AS MS_Name
+UNION ALL
+SELECT 6 AS MS_Key, 'BD-04' AS MS_BDCode, 'Developers' AS MS_Name
+UNION ALL
+SELECT 7 AS MS_Key, 'BD-05' AS MS_BDCode, 'CD 1' AS MS_Name
+UNION ALL
+SELECT 8 AS MS_Key, 'BD-06' AS MS_BDCode, 'CD 2' AS MS_Name
+UNION ALL
+SELECT 10 AS MS_Key, 'BD-07' AS MS_BDCode, 'Schools/Institutional' AS MS_Name
+UNION ALL
+SELECT 11 AS MS_Key, 'BD-08' AS MS_BDCode, 'Energy Upstream' AS MS_Name
+UNION ALL
+SELECT 12 AS MS_Key, 'BD-09' AS MS_BDCode, 'Energy Midstream' AS MS_Name)
+/****************/
+/** Sales data **/
+/****************/
+INSERT INTO @LTMData (DataType, MktSegLbl, Emp_Name, DataValue)
+SELECT ISNULL(data.DataType, 'P-Time') AS DataType
+     , BDs.MS_BDCode + ' ' + BDs.MS_Name AS MktSegLbl
+     , data.Emp_Name AS Emp_Name
+     , data.Tim_WrkHrs AS DataValue
+FROM BDs
+LEFT JOIN (
+SELECT 'Converted P-Time' AS DataType
+     , Tim_WrkHrs        = SUM(tim.Tim_Wrkhrs)
+                   , Tim_BilHrs        = SUM(tim.Tim_BilHrs)
+     , Emp_Name          = dbo.Emp_Name_By_Key(emp.emp_Key)
+     , MS_BDCode         = ms.MS_BDCode
+FROM dbo.Time tim
+JOIN dbo.Project prj
+ON tim.Prj_Key = prj.Prj_Key
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.MarketSegment ms
+ON cli.MS_Key = ms.MS_Key
+JOIN dbo.Phase phs
+ON tim.phs_key = phs.Phs_Key
+JOIN dbo.Employee emp
+ON tim.emp_Key = emp.Emp_Key
+WHERE tim.tim_IsCurrent = 0
+AND phs.Phs_Name LIKE 'P-%'
+AND prj.Prj_Idno LIKE 'C-%'
+AND tim.Tim_WrkDate BETWEEN case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then DATEADD(dd,1,EOMONTH(GetDate(),-14)) else DATEADD(dd,1,EOMONTH(GetDate(),-13)) end AND case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-1) else EOMONTH(GetDate(),0) end
+AND (
+         (@ReportType IN (0,4))
+     OR ((@ReportType = 1) AND emp.Emp_Key IN (@FilterList))
+    )
+GROUP BY dbo.Emp_Name_By_Key(emp.emp_Key), ms.MS_BDCode
+UNION ALL
+SELECT 'P-Time'
+     , Tim_WrkHrs        = SUM(tim.Tim_Wrkhrs)
+                   , Tim_BilHrs        = SUM(tim.Tim_BilHrs)
+     , Emp_Name          = dbo.Emp_Name_By_Key(emp.Emp_Key)
+     , MS_BDCode         = ms.MS_BDCode
+FROM dbo.Time tim
+JOIN dbo.Project prj
+ON tim.Prj_Key = prj.Prj_Key
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.MarketSegment ms
+ON cli.MS_Key = ms.MS_Key
+JOIN dbo.Employee emp
+ON tim.Emp_Key = emp.Emp_Key
+JOIN dbo.Phase phs
+ON tim.phs_key = phs.Phs_Key
+WHERE tim.tim_IsCurrent = 1
+AND phs.Phs_Name LIKE 'P-%'
+AND tim.Tim_WrkDate BETWEEN case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then DATEADD(dd,1,EOMONTH(GetDate(),-14)) else DATEADD(dd,1,EOMONTH(GetDate(),-13)) end AND case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-1) else EOMONTH(GetDate(),0) end
+AND (
+         (@ReportType IN (0,4))
+     OR ((@ReportType = 1) AND emp.Emp_Key IN (@FilterList))
+    )
+GROUP BY  dbo.Emp_Name_By_Key(emp.Emp_Key), ms.MS_BDCode
+) data
+ON BDs.MS_BDCode = data.MS_BDCode
+WHERE (
+         (@ReportType IN (0,1))
+     OR ((@ReportType = 4) AND BDs.MS_Key IN (@FilterList))
+    )
+/*********************/
+/** Networking data **/
+/*********************/
+UNION ALL
+SELECT 'Networking' AS DataType
+     , BDs.MS_BDCode + ' ' + BDs.MS_Name AS MktSegLbl
+     , data.Emp_Name AS Emp_Name
+    , data.Tim_WrkHrs AS DataValue
+FROM BDs
+LEFT JOIN (
+SELECT Tim_WrkHrs        = SUM(tim.Tim_WrkHrs)
+     , Emp_Name          = dbo.Emp_Name_By_Key(emp.Emp_Key)
+     , MS_BDCode         = ms.MS_BDCode
+FROM dbo.Time tim
+JOIN dbo.Project prj
+ON tim.Prj_Key = prj.Prj_Key
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.MarketSegment ms
+ON cli.MS_Key = ms.MS_Key
+OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+JOIN dbo.Employee emp
+ON tim.Emp_Key = emp.Emp_Key
+WHERE tim.tim_IsCurrent = 1
+AND (prj.Prj_idno LIKE 'BD-%'
+OR  prj.Prj_idno LIKE 'I-%')
+AND tim.Act_Key &lt;&gt; 131 -- do not include Market Segment Leader activity
+AND tim.Tim_WrkDate BETWEEN case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then DATEADD(dd,1,EOMONTH(GetDate(),-14)) else DATEADD(dd,1,EOMONTH(GetDate(),-13)) end AND case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-1) else EOMONTH(GetDate(),0) end
+AND (
+         (@ReportType IN (0,4))
+     OR ((@ReportType = 1) AND emp.Emp_Key IN (@FilterList))
+    )
+GROUP BY  dbo.Emp_Name_By_Key(emp.Emp_Key), ms.MS_BDCode
+) data
+ON BDs.MS_BDCode = data.MS_BDCode
+WHERE (
+         (@ReportType IN (0,1))
+     OR ((@ReportType = 4) AND BDs.MS_Key IN (@FilterList))
+    )
+--/*******************/
+--/** Billings data **/
+--/*******************/
+UNION ALL
+SELECT 'Billings' AS DataType
+     , BDs.MS_BDCode + ' ' + BDs.MS_Name AS MktSegLbl
+     , data.Emp_Name AS Emp_Name
+     , data.Inv_Amt AS DataValue
+FROM BDs
+LEFT JOIN (
+SELECT
+                Inv_Amt            = SUM(inv.Inv_Amt*-1)
+  , Emp_Name          = dbo.Emp_Name_By_Key(emp.Emp_Key)
+  , MS_BDCode         = ms.MS_BDCode
+FROM  dbo.Invoice inv
+JOIN dbo.Project prj
+ON prj.Prj_Key = inv.Prj_Key
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.MarketSegment ms
+ON cli.MS_Key = ms.MS_Key
+OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+JOIN dbo.Employee emp
+ON emp.Emp_Key = prj.PM_Key
+WHERE     (inv.Inv_IsCurrent = 1)
+AND (inv.Inv_Date BETWEEN case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then DATEADD(dd,1,EOMONTH(GetDate(),-14)) else DATEADD(dd,1,EOMONTH(GetDate(),-13)) end AND case when getdate() &lt; DATEADD(WEEK, DATEDIFF(WEEK, 0, DATEADD(DAY, 6 - DATEPART(DAY, GETDATE()), GETDATE())), 1)
+	  then EOMONTH(GetDate(),-1) else EOMONTH(GetDate(),0) end)
+AND (
+           (@ReportType IN (0,4))
+       OR ((@ReportType = 1) AND emp.Emp_Key IN (@FilterList))
+      )
+  GROUP BY dbo.Emp_Name_By_Key(emp.Emp_Key), ms.MS_BDCode
+) data
+ON BDs.MS_BDCode = data.MS_BDCode
+WHERE (
+         (@ReportType IN (0,1))
+     OR ((@ReportType = 4) AND BDs.MS_Key IN (@FilterList))
+    )
+ 
+ 
+SELECT DataType, MktSegLbl, Emp_Name, DataValue
+FROM @LTMData
+UNION ALL
+SELECT 'SalesTotal' AS DataType
+, MktSegLbl
+, NULL AS Emp_Name
+, 0.1*SUM(DataValue) AS DataValue
+FROM @LTMData
+WHERE DataType IN ('P-Time','Converted P-Time')
+GROUP BY MktSegLbl</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="DataType">
+        <DataField>DataType</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MktSegLbl">
+        <DataField>MktSegLbl</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Name">
+        <DataField>Emp_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="DataValue">
+        <DataField>DataValue</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

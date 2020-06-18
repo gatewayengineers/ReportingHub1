@@ -1,0 +1,406 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="ProfessionalResources_Utilization">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@OperationsReport">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@UserName">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>DECLARE @CurYear INT;
+DECLARE @TimesheetDate DATE;
+
+SET @CurYear = Year(GetDate())
+
+
+SELECT @TimesheetDate = MAX(Tim_Timesheetdate)
+FROM dbo.Time
+
+SELECT util.*,uexp.ActUtilExp_Amt
+FROM (
+SELECT emp.Emp_Key
+     , RTRIM(emp.Emp_CompanyUserName) AS Emp_CompanyUserName
+     , dbo.Emp_Name_By_Key(emp.Emp_Key) AS Emp_Name
+     , emp.Emp_Idno
+     , emp.Emp_Initials
+     , emp.Emp_Status
+     , supv.Emp_Key as Supv_Key
+     , dbo.Emp_Name_By_Key(supv.Emp_Key) AS Supv_Name
+     , supv.Emp_Idno AS Supv_Idno
+     , supv.Emp_Initials as Supv_Initials
+     , tm.Team_Key
+     , tm.Team_Name
+     , dbo.Emp_Name_By_Key(tml.Emp_Key) AS TML_Name
+     , tml.Emp_Idno as TML_Idno
+     , tml.Emp_Initials as TML_Initials
+     , ISNULL(util.Cur_Direct,0) AS Cur_Direct
+     , ISNULL(util.YTD_Direct,0) AS YTD_Direct
+     , ISNULL(bdg.Util_BdgDirect,0) AS Bdg_Direct
+     , ISNULL(util.Cur_Holi,0) AS Cur_Holi
+     , ISNULL(util.YTD_Holi,0) AS YTD_Holi
+     , ISNULL(bdg.Util_BdgHoli,0) AS Bdg_Holi
+     , ISNULL(util.Cur_Mgmt,0) AS Cur_Mgmt
+     , ISNULL(util.YTD_Mgmt,0) AS YTD_Mgmt
+     , ISNULL(bdg.Util_BdgMgmt,0) AS Bdg_Mgmt
+     , ISNULL(util.Cur_Mktg,0) AS Cur_Mktg
+     , ISNULL(util.YTD_Mktg,0) AS YTD_Mktg
+     , ISNULL(bdg.Util_BdgMkt,0) AS Bdg_Mktg
+     , ISNULL(util.Cur_Prop,0) AS Cur_Prop
+     , ISNULL(util.YTD_Prop,0) AS YTD_Prop
+     , ISNULL(bdg.Util_BdgProp,0) AS Bdg_Prop
+     , ISNULL(util.Cur_PTO,0) AS Cur_PTO
+     , ISNULL(util.YTD_PTO,0) AS YTD_PTO
+     , ISNULL(bdg.Util_BdgPTO,0) AS Bdg_PTO
+     , ISNULL(util.Cur_Train,0) AS Cur_Train
+    , ISNULL(util.YTD_Train,0) AS YTD_Train
+     , ISNULL(bdg.Util_BdgTrain,0) AS Bdg_Train
+     , ISNULL(bdg.Util_BdgIndirect,0) AS Bdg_Indirect
+     , ISNULL(util.Cur_Std,0) AS Cur_Std
+     , CASE WHEN emp.Emp_PayFlg = N'S' THEN ((bdg.Util_BdgStd)/(bdg.WeeksOfBudget)) * (DATEDIFF(wk, YrStartDate, YrEndDate) + 1)
+            ELSE ISNULL(util.YTD_Total,0) END as YTD_Std
+     , emp.Emp_PayFlg
+     , ISNULL(bdg.Util_BdgStd,0) AS Bdg_Std
+     , ISNULL(util.Cur_Ovt,0) AS Cur_Ovt
+     , ISNULL(util.Cur_Total,0) AS Cur_Total
+     , ISNULL(util.YTD_Total,0) AS YTD_Total
+     , ISNULL(bdg.Util_BdgTotal,0) AS Bdg_Total
+     , YrStartDate
+     , YrEndDate
+     , RptYearUtilStartDate
+     , RptYearUtilEndDate
+     , RptWeekEndDate
+     , bdg.WeeksOfBudget
+     , Accrued_PTO
+FROM 
+(SELECT tim.Emp_Key
+     , SUM(CASE WHEN tim.Tim_Type = N'D' AND tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) AS Cur_Direct
+     , SUM(CASE WHEN tim.Tim_Type = N'D' THEN tim.Tim_WrkHrs ELSE 0 END) AS YTD_Direct
+     , SUM(CASE WHEN tim.Tim_Type = N'HOLI' AND tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) AS Cur_Holi
+     , SUM(CASE WHEN tim.Tim_Type = N'HOLI' THEN tim.Tim_WrkHrs ELSE 0 END) AS YTD_Holi
+     , SUM(CASE WHEN tim.Tim_Type = N'MGMT' AND tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) AS Cur_Mgmt
+     , SUM(CASE WHEN tim.Tim_Type = N'MGMT' THEN tim.Tim_WrkHrs ELSE 0 END) AS YTD_Mgmt
+     , SUM(CASE WHEN tim.Tim_Type = N'MKTG' AND tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) AS Cur_Mktg
+     , SUM(CASE WHEN tim.Tim_Type = N'MKTG' THEN tim.Tim_WrkHrs ELSE 0 END) AS YTD_Mktg
+     , SUM(CASE WHEN tim.Tim_Type = N'PROP' AND tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) AS Cur_Prop
+     , SUM(CASE WHEN tim.Tim_Type = N'PROP' THEN tim.Tim_WrkHrs ELSE 0 END) AS YTD_Prop
+     , SUM(CASE WHEN tim.Tim_Type = N'PTO' AND tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate AND YEAR(tim.Tim_WrkDate) = YEAR(@TimesheetDate) AND emp.Emp_PayFlg = 'S' THEN tim.Tim_WrkHrs 
+                WHEN tim.Tim_Type = N'PTO' AND tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate AND emp.Emp_PayFlg &lt;&gt; 'S' THEN tim.Tim_WrkHrs 
+                ELSE 0 END) AS Cur_PTO -- hardcoded filter as per jjesso via poleary 
+     , SUM(CASE WHEN tim.Tim_Type = N'PTO' AND YEAR(tim.Tim_WrkDate) = YEAR(@TimesheetDate) AND emp.Emp_PayFlg = 'S' THEN tim.Tim_WrkHrs 
+                WHEN tim.Tim_Type = N'PTO' AND emp.Emp_PayFlg &lt;&gt; 'S' THEN tim.Tim_WrkHrs
+                ELSE 0 END) AS YTD_PTO -- hardcoded filter as per jjesso via poleary 
+     , SUM(CASE WHEN tim.Tim_Type = N'TRAN' AND tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) AS Cur_Train
+     , SUM(CASE WHEN tim.Tim_Type = N'TRAN' THEN tim.Tim_WrkHrs ELSE 0 END) AS YTD_Train
+     , CASE WHEN emp.Emp_PayFlg &lt;&gt; 'S' THEN SUM(CASE WHEN tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END)
+            WHEN SUM(CASE WHEN tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) &gt; 40 THEN 40 ELSE SUM(CASE WHEN tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) END AS Cur_Std
+     , CASE WHEN emp.Emp_PayFlg = 'S' AND SUM(CASE WHEN tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) &gt; 40 THEN SUM(CASE WHEN tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) - 40 ELSE 0 END AS Cur_Ovt
+     , SUM(CASE WHEN tim.tim_WrkDate BETWEEN dts.RptWeekStartDate AND dts.RptWeekEndDate THEN tim.Tim_WrkHrs ELSE 0 END) AS Cur_Total
+     , SUM(tim.Tim_WrkHrs) AS YTD_Total
+     , MIN(DATEADD(wk,DATEDIFF(wk,0,tim.Tim_WrkDate),-1))  as YrStartDate
+     , MAX(DATEADD(wk,DATEDIFF(wk,0,tim.Tim_WrkDate),5))  as YrEndDate
+     , MIN(dts.RptYearUtilStartDate) as RptYearUtilStartDate
+     , MAX(dts.RptYearUtilEndDate) as RptYearUtilEndDate
+     , MAX(dts.RptWeekEndDate) AS RptWeekEndDate
+     , ytdacc.Accrued_PTO
+FROM dbo.Time tim 
+JOIN (SELECT MAX(RptWeekStartDate) RptWeekStartDate, MAX(RptWeekEndDate) RptWeekEndDate,
+             MAX(RptYearUtilStartDate) RptYearUtilStartDate, MAX(RptYearUtilEndDate) RptYearUtilEndDate 
+             , DATEDIFF(wk,MAX(RptYearUtilStartDate),MAX(RptWeekEndDate)) + 1 as UtilWks
+      FROM dbo.ReportingDates
+      WHERE RptWeekEndDate &lt;= @TimesheetDate) dts
+ON tim.Tim_WrkDate BETWEEN dts.RptYearUtilStartDate ANd dts.RptYearUtilEndDate
+JOIN (select * from dbo.Employee) emp 
+ON tim.Emp_Key = emp.Emp_Key 
+LEFT JOIN dbo.UtilizationBudget bdg
+ON bdg.Emp_Key = emp.Emp_Key AND bdg.Util_BdgYear = @CurYear
+LEFT JOIN (SELECT pr.Emp_Key, SUM(pr.Pay_Hrs) as Accrued_PTO
+           FROM dbo.Payroll pr
+           WHERE pr.Pay_DeductionName = 'Vacation and Sick Ac'
+           AND YEAR(Pay_Date) = Year(GetDate())
+           GROUP BY pr.Emp_Key) ytdacc
+ON emp.Emp_Key = ytdacc.Emp_Key
+WHERE  (tim.Tim_IsCurrent = 1) 
+GROUP BY tim.Emp_Key
+       , emp.Emp_PayFlg
+       , ytdacc.Accrued_PTO) util
+FULL JOIN (SELECT ubdg.Emp_Key
+           , ubdg.util_BdgDirect
+           , ubdg.Util_BdgIndirect
+           , ubdg.Util_BdgHoli
+           , ubdg.Util_BdgMgmt
+           , ubdg.Util_BdgMkt
+           , ubdg.Util_BdgProp
+           , ubdg.Util_BdgPTO
+           , ubdg.Util_BdgTrain
+           , ubdg.Util_BdgStd
+           , ubdg.Util_BdgTotal
+           /*, DATEDIFF(wk,ubdg.Util_EffStartDate,ubdg.Util_EffEndDate) + 1 AS WeeksOfBudget*/
+           , ubdg.Util_BdgWeeks AS WeeksOfBudget
+      FROM dbo.UtilizationBudget ubdg
+      WHERE ubdg.Util_BdgYear = @CurYear) bdg
+ON util.Emp_Key = bdg.Emp_Key
+JOIN dbo.Employee emp
+ON emp.Emp_Key = ISNULL(util.Emp_Key,bdg.Emp_Key)
+JOIN dbo.Employee supv
+ON emp.Supervisor_Key = supv.Emp_Key
+JOIN dbo.Team tm
+ON tm.Team_Key = emp.Team_Key
+Left Outer JOIN dbo.Employee tml
+ON tm.Team_Leader = tml.Emp_Idno
+WHERE (
+        (@OperationsReport = 1 AND @ReportType = 3 AND tm.Team_Key=11)
+       OR (@OperationsReport = 0 AND @ReportType = 3 AND tm.Team_Key=11)
+       OR (@OperationsReport = 1 AND @ReportType = 2 AND ISNULL(RTRIM(supv.Emp_CompanyUserName),supv.Emp_Key) IN (@FilterList))
+       OR (@OperationsReport = 0 AND @ReportType = 2 AND ISNULL(RTRIM(supv.Emp_CompanyUserName),supv.Emp_Key) = (@UserName))
+       OR (@OperationsReport = 1 AND @ReportType = 1 AND ISNULL(RTRIM(emp.Emp_CompanyUserName),emp.Emp_Key) IN (@FilterList))
+       OR (@OperationsReport = 0 AND @ReportType = 1 AND ISNULL(RTRIM(emp.Emp_CompanyUserName),emp.Emp_Key) = (@UserName))
+      ) 
+) util
+LEFT JOIN dbo.UtilizationExpenses1 uexp
+ON util.Emp_Key = uexp.Emp_Key</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Emp_Key">
+        <DataField>Emp_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Emp_CompanyUserName">
+        <DataField>Emp_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Name">
+        <DataField>Emp_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Idno">
+        <DataField>Emp_Idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Initials">
+        <DataField>Emp_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Status">
+        <DataField>Emp_Status</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Supv_Key">
+        <DataField>Supv_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Supv_Name">
+        <DataField>Supv_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Supv_Initials">
+        <DataField>Supv_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Team_Name">
+        <DataField>Team_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Supv_Idno">
+        <DataField>Supv_Idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="TML_Name">
+        <DataField>TML_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Team_Key">
+        <DataField>Team_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="TML_Initials">
+        <DataField>TML_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Direct">
+        <DataField>Cur_Direct</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTD_Direct">
+        <DataField>YTD_Direct</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="TML_Idno">
+        <DataField>TML_Idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_Direct">
+        <DataField>Bdg_Direct</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Holi">
+        <DataField>Cur_Holi</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTD_Holi">
+        <DataField>YTD_Holi</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_Holi">
+        <DataField>Bdg_Holi</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Mgmt">
+        <DataField>Cur_Mgmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTD_Mgmt">
+        <DataField>YTD_Mgmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_Mgmt">
+        <DataField>Bdg_Mgmt</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Mktg">
+        <DataField>Cur_Mktg</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTD_Mktg">
+        <DataField>YTD_Mktg</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_Mktg">
+        <DataField>Bdg_Mktg</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Prop">
+        <DataField>Cur_Prop</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTD_Prop">
+        <DataField>YTD_Prop</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_Prop">
+        <DataField>Bdg_Prop</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Cur_PTO">
+        <DataField>Cur_PTO</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTD_PTO">
+        <DataField>YTD_PTO</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_PTO">
+        <DataField>Bdg_PTO</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Train">
+        <DataField>Cur_Train</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTD_Train">
+        <DataField>YTD_Train</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_Train">
+        <DataField>Bdg_Train</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_Indirect">
+        <DataField>Bdg_Indirect</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Std">
+        <DataField>Cur_Std</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_Std">
+        <DataField>Bdg_Std</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="YTD_Std">
+        <DataField>YTD_Std</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Ovt">
+        <DataField>Cur_Ovt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Emp_PayFlg">
+        <DataField>Emp_PayFlg</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Total">
+        <DataField>Cur_Total</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTD_Total">
+        <DataField>YTD_Total</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YrStartDate">
+        <DataField>YrStartDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_Total">
+        <DataField>Bdg_Total</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Cur_Indirect">
+        <Value>=Fields!Cur_Total.Value-Fields!Cur_Direct.Value</Value>
+      </Field>
+      <Field Name="RptYearUtilStartDate">
+        <DataField>RptYearUtilStartDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="WeeksOfBudget">
+        <DataField>WeeksOfBudget</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="RptYearUtilEndDate">
+        <DataField>RptYearUtilEndDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="YTD_Indirect">
+        <Value>=Fields!YTD_Total.Value-Fields!YTD_Direct.Value</Value>
+      </Field>
+      <Field Name="Accrued_PTO">
+        <DataField>Accrued_PTO</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="ActUtilExp_Amt">
+        <DataField>ActUtilExp_Amt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="RptWeekEndDate">
+        <DataField>RptWeekEndDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="YrEndDate">
+        <DataField>YrEndDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="Projects_MarkUpWriteOff_Stats_By_PM_LTM_Matrix">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@PrevMonthOnly">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>if @PrevMonthOnly = 1
+WITH inv AS (SELECT inv1.prj_key
+                  , YEAR(Inv_Date) AS Inv_YR
+                  , MONTH(Inv_Date) AS Inv_Mnth
+                  , SUBSTRING(DATENAME(MM,inv1.Inv_Date),1,3) AS Inv_MON
+                  , SUM(-1*inv_amt) inv_amt
+             FROM dbo.Invoice inv1
+             WHERE inv1.Inv_IsCurrent = 1
+             AND inv1.inv_date BETWEEN DATEADD(dd, 1, EOMONTH(GetDate(), -13)) AND EOMONTH(GetDate(), -1)
+             AND (   (ISNULL(@PrevMonthOnly,0) &lt;&gt; 1)
+                  OR (@PrevMonthOnly = 1 AND inv1.inv_date &gt;= DATEADD(dd, 1, EOMONTH(GetDate(), -DATEPART(MM,GetDate()))))
+                 )
+             GROUP BY inv1.prj_key
+                  , YEAR(Inv_Date) 
+                  , MONTH(Inv_Date)
+                  , SUBSTRING(DATENAME(MM,inv1.Inv_Date),1,3)
+                  )
+,     wo AS (SELECT prj_key
+                  , YEAR(wo1.Wo_Date) AS Wo_YR
+                  , MONTH(wo1.Wo_Date) AS Wo_Mnth
+                  , SUBSTRING(DATENAME(MM,wo1.Wo_Date),1,3) AS Wo_MON
+                  , SUM(wo1.wo_amt) wo_amt
+             FROM dbo.vWriteoffs wo1
+             WHERE wo1.wo_date BETWEEN DATEADD(dd, 1, EOMONTH(GetDate(), -13)) AND EOMONTH(GetDate(), -1)
+             AND (   (ISNULL(@PrevMonthOnly,0) &lt;&gt; 1)
+                  OR (@PrevMonthOnly = 1 AND wo1.wo_date &gt;= DATEADD(dd, 1, EOMONTH(GetDate(), -DATEPART(MM,GetDate()))))
+                 )
+             GROUP BY prj_key
+                    , YEAR(wo1.Wo_Date)
+                    , MONTH(wo1.Wo_Date)
+                    , SUBSTRING(DATENAME(MM,wo1.Wo_Date),1,3))
+select case when t1.mon is null then t2.Mont else t1.MON end MON,case when t1.YR is null then t2.Yrs else t1.YR end YR,case when t1.Month_Of_Year is null then t2.MOY else t1.Month_Of_Year end Month_Of_Year,
+t1.Emp_LastName,t1.Emp_FirstName,t1.Emp_MiddleInitial,t1.Pic_lastname,t1.Pic_firstname,t1.Pic_middleinitial,case when t1.Wo_Amt is null then t2.Wo_amt else t1.Wo_Amt end Wo_Amt,
+case when t1.BILLINGS is null then t2.Billings else t1.BILLINGS end BILLINGS,case when t1.WOPctBillings is null then t2.WOPctBillings else t1.WOPctBillings end WOPctBillings from (
+SELECT woinv.MON
+, woinv.YR
+, woinv. Month_Of_Year
+, emp.Emp_lastname
+, emp.Emp_firstname
+, emp.Emp_middleinitial
+, pic.Emp_lastname AS Pic_lastname
+, pic.Emp_firstname AS Pic_firstname
+, pic.Emp_middleinitial AS Pic_middleinitial
+, SUM(woinv.WO_amt) as Wo_Amt
+, SUM(woinv.inv_amt) BILLINGS
+, CASE WHEN ISNULL(SUM(woinv.inv_amt),0) = 0 THEN NULL else SUM(woinv.Wo_amt)/ SUM(woinv.inv_amt) END as WOPctBillings
+FROM dbo.Project prj 
+JOIN dbo.Employee emp
+ON prj.PM_Key = emp.Emp_Key
+LEFT JOIN dbo.Employee pic
+ON prj.PIC_Key = pic.Emp_Key
+JOIN (SELECT ISNULL(wo.Prj_Key,inv.Prj_Key) Prj_Key
+           , wo.Wo_Amt  
+           , inv.inv_amt
+           , ISNULL(Wo_MON,Inv_Mon) AS MON
+           , ISNULL(Wo_YR,Inv_YR) AS YR
+           , ISNULL(Wo_Mnth,Inv_Mnth) as Month_Of_Year
+      FROM wo 
+      FULL JOIN inv
+      ON  wo.Prj_Key = inv.Prj_Key
+      AND wo.Wo_Mnth = inv.Inv_Mnth
+      AND wo.Wo_YR   = inv.Inv_YR
+    ) woinv
+ON prj.Prj_Key = woinv.Prj_Key
+WHERE (ISNULL(woinv.wo_amt,0) &lt;&gt; 0 OR ISNULL(woinv.inv_amt,0) &lt;&gt; 0)
+AND prj.Prj_Type = 'D'
+GROUP BY woinv.MON
+, woinv.YR 
+, woinv.Month_Of_Year
+, emp.Emp_firstname
+, emp.Emp_middleinitial
+, emp.Emp_lastname
+, pic.Emp_firstname
+, pic.Emp_middleinitial
+, pic.Emp_lastname) T1
+Right Outer Join
+(Select 'Jan' Mont,Year(dateadd(year,0,getdate())) as Yrs,1 MOY,Null Wo_amt,Null Billings,Null WOPctBillings
+Union All
+Select 'Feb' Mont,Year(dateadd(year,0,getdate())) as Yrs,2 MOY,Null Wo_amt,Null Billings,Null WOPctBillings
+Union All
+Select 'Mar' Mont,Year(dateadd(year,0,getdate())) as Yrs,3 MOY,Null Wo_amt,Null Billings,Null WOPctBillings
+Union All
+Select 'Apr' Mont,Year(dateadd(year,0,getdate())) as Yrs,4 MOY,Null Wo_amt,Null Billings,Null WOPctBillings
+Union All
+Select 'May' Mont,Year(dateadd(year,0,getdate())) as Yrs,5 MOY,Null Wo_amt,Null Billings,Null WOPctBillings
+Union All
+Select 'Jun' Mont,Year(dateadd(year,0,getdate())) as Yrs,6 MOY,Null Wo_amt,NULL Billings,NULL WOPctBillings
+Union all
+Select 'Jul' Mont,Year(dateadd(year,0,getdate())) as Yrs,7 MOY,NULL Wo_amt,NULL Billings,NULL WOPctBillings
+Union All
+Select 'Aug' Mont,Year(dateadd(year,0,getdate())) as Yrs,8 MOY,NULL Wo_amt,NULL Billings,NULL WOPctBillings
+Union All
+Select 'Sep' Mont,Year(dateadd(year,0,getdate())) as Yrs,9 MOY,NULL Wo_amt,NULL Billings,NULL WOPctBillings
+Union All
+Select 'Oct' Mont,Year(dateadd(year,0,getdate())) as Yrs,10 MOY,NULL Wo_amt,NULL Billings,NULL WOPctBillings
+Union All
+Select 'Nov' Mont,Year(dateadd(year,0,getdate())) as Yrs,11 MOY,NULL Wo_amt,NULL Billings,NULL WOPctBillings
+Union All
+Select 'Dec' Mont,Year(dateadd(year,0,getdate())) as Yrs,12 MOY,NULL Wo_amt,NULL Billings,NULL WOPctBillings) T2
+on t1.YR = t2.Yrs AND t1.Month_Of_Year = t2.MOY
+Else
+WITH inv AS (SELECT inv1.prj_key
+                  , YEAR(Inv_Date) AS Inv_YR
+                  , MONTH(Inv_Date) AS Inv_Mnth
+                  , SUBSTRING(DATENAME(MM,inv1.Inv_Date),1,3) AS Inv_MON
+                  , SUM(-1*inv_amt) inv_amt
+             FROM dbo.Invoice inv1
+             WHERE inv1.Inv_IsCurrent = 1
+             AND inv1.inv_date BETWEEN DATEADD(dd, 1, EOMONTH(GetDate(), -13)) AND EOMONTH(GetDate(), -1)
+             AND (   (ISNULL(@PrevMonthOnly,0) &lt;&gt; 1)
+                  OR (@PrevMonthOnly = 1 AND inv1.inv_date &gt;= DATEADD(dd, 1, EOMONTH(GetDate(), -DATEPART(MM,GetDate()))))
+                 )
+             GROUP BY inv1.prj_key
+                  , YEAR(Inv_Date) 
+                  , MONTH(Inv_Date)
+                  , SUBSTRING(DATENAME(MM,inv1.Inv_Date),1,3)
+                  )
+,     wo AS (SELECT prj_key
+                  , YEAR(wo1.Wo_Date) AS Wo_YR
+                  , MONTH(wo1.Wo_Date) AS Wo_Mnth
+                  , SUBSTRING(DATENAME(MM,wo1.Wo_Date),1,3) AS Wo_MON
+                  , SUM(wo1.wo_amt) wo_amt
+             FROM dbo.vWriteoffs wo1
+             WHERE wo1.wo_date BETWEEN DATEADD(dd, 1, EOMONTH(GetDate(), -13)) AND EOMONTH(GetDate(), -1)
+             AND (   (ISNULL(@PrevMonthOnly,0) &lt;&gt; 1)
+                  OR (@PrevMonthOnly = 1 AND wo1.wo_date &gt;= DATEADD(dd, 1, EOMONTH(GetDate(), -DATEPART(MM,GetDate()))))
+                 )
+             GROUP BY prj_key
+                    , YEAR(wo1.Wo_Date)
+                    , MONTH(wo1.Wo_Date)
+                    , SUBSTRING(DATENAME(MM,wo1.Wo_Date),1,3))
+SELECT woinv.MON
+, woinv.YR
+, woinv. Month_Of_Year
+, emp.Emp_lastname
+, emp.Emp_firstname
+, emp.Emp_middleinitial
+, pic.Emp_lastname AS Pic_lastname
+, pic.Emp_firstname AS Pic_firstname
+, pic.Emp_middleinitial AS Pic_middleinitial
+, SUM(woinv.WO_amt) as Wo_Amt
+, SUM(woinv.inv_amt) BILLINGS
+, CASE WHEN ISNULL(SUM(woinv.inv_amt),0) = 0 THEN NULL else SUM(woinv.Wo_amt)/ SUM(woinv.inv_amt) END as WOPctBillings
+FROM dbo.Project prj 
+JOIN dbo.Employee emp
+ON prj.PM_Key = emp.Emp_Key
+LEFT JOIN dbo.Employee pic
+ON prj.PIC_Key = pic.Emp_Key
+JOIN (SELECT ISNULL(wo.Prj_Key,inv.Prj_Key) Prj_Key
+           , wo.Wo_Amt  
+           , inv.inv_amt
+           , ISNULL(Wo_MON,Inv_Mon) AS MON
+           , ISNULL(Wo_YR,Inv_YR) AS YR
+           , ISNULL(Wo_Mnth,Inv_Mnth) as Month_Of_Year
+      FROM wo 
+      FULL JOIN inv
+      ON  wo.Prj_Key = inv.Prj_Key
+      AND wo.Wo_Mnth = inv.Inv_Mnth
+      AND wo.Wo_YR   = inv.Inv_YR
+    ) woinv
+ON prj.Prj_Key = woinv.Prj_Key
+WHERE (ISNULL(woinv.wo_amt,0) &lt;&gt; 0 OR ISNULL(woinv.inv_amt,0) &lt;&gt; 0)
+AND prj.Prj_Type = 'D'
+GROUP BY woinv.MON
+, woinv.YR 
+, woinv.Month_Of_Year
+, emp.Emp_firstname
+, emp.Emp_middleinitial
+, emp.Emp_lastname
+, pic.Emp_firstname
+, pic.Emp_middleinitial
+, pic.Emp_lastname</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="MON">
+        <DataField>MON</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="YR">
+        <DataField>YR</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Month_Of_Year">
+        <DataField>Month_Of_Year</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Emp_firstname">
+        <DataField>Emp_FirstName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_middleinitial">
+        <DataField>Emp_MiddleInitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_lastname">
+        <DataField>Emp_LastName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Pic_lastname">
+        <DataField>Pic_lastname</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Wo_Amt">
+        <DataField>Wo_Amt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Pic_firstname">
+        <DataField>Pic_firstname</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="BILLINGS">
+        <DataField>BILLINGS</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Pic_middleinitial">
+        <DataField>Pic_middleinitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="WOPctBillings">
+        <DataField>WOPctBillings</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="PM_NAME">
+        <Value>=RTRIM(Fields!Emp_lastname.Value) &amp; ", " &amp; RTRIM(Fields!Emp_firstname.Value) &amp; " " &amp; RTRIM(Fields!Emp_middleinitial.Value) &amp; "."</Value>
+      </Field>
+      <Field Name="PIC_NAME">
+        <Value>=RTRIM(Fields!Pic_lastname.Value) &amp; ", " &amp; RTRIM(Fields!Pic_firstname.Value) &amp; " " &amp; RTRIM(Fields!Pic_middleinitial.Value) &amp; "."</Value>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

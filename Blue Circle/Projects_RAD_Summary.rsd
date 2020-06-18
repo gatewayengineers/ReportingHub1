@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@ProjectionOffset">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Int32</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Int32</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+          <rd:IsMultiValued>true</rd:IsMultiValued>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>WITH radproj AS (SELECT SUM(CASE WHEN prjcts.Projection_WeekStartDate = DATEADD(WW,0+@ProjectionOffset,si.SubInfo_CurrentReportingDate) THEN prjcts.Projection_Hrs ELSE 0 END) AS Week1
+                      , SUM(CASE WHEN prjcts.Projection_WeekStartDate = DATEADD(WW,1+@ProjectionOffset,si.SubInfo_CurrentReportingDate) THEN prjcts.Projection_Hrs ELSE 0 END) AS Week2
+                      , SUM(CASE WHEN prjcts.Projection_WeekStartDate = DATEADD(WW,2+@ProjectionOffset,si.SubInfo_CurrentReportingDate) THEN prjcts.Projection_Hrs ELSE 0 END) AS Week3
+                      , SUM(CASE WHEN prjcts.Projection_WeekStartDate = DATEADD(WW,3+@ProjectionOffset,si.SubInfo_CurrentReportingDate) THEN prjcts.Projection_Hrs ELSE 0 END) AS Week4
+                      , DATEADD(WW,0+@ProjectionOffset,si.SubInfo_CurrentReportingDate) AS Date1
+                      , DATEADD(WW,1+@ProjectionOffset,si.SubInfo_CurrentReportingDate) AS Date2
+                      , DATEADD(WW,2+@ProjectionOffset,si.SubInfo_CurrentReportingDate) AS Date3
+                      , DATEADD(WW,3+@ProjectionOffset,si.SubInfo_CurrentReportingDate) AS Date4
+                      , Emp_Key
+                      , Prj_Key
+                 FROM dbo.Projections prjcts
+                 JOIN dbo.SubmissionInfo si
+                 ON prjcts.Projection_WeekStartDate BETWEEN DATEADD(WW,0+@ProjectionOffset,si.SubInfo_CurrentReportingDate) AND DATEADD(WW,3+@ProjectionOffset,SubInfo_CurrentReportingDate)
+                 GROUP BY Emp_Key
+                        , Prj_Key
+                        , DATEADD(WW,0+@ProjectionOffset,si.SubInfo_CurrentReportingDate)
+                        , DATEADD(WW,1+@ProjectionOffset,si.SubInfo_CurrentReportingDate)
+                        , DATEADD(WW,2+@ProjectionOffset,si.SubInfo_CurrentReportingDate)
+                        , DATEADD(WW,3+@ProjectionOffset,si.SubInfo_CurrentReportingDate)
+                ),radplan AS (SELECT SUM(CASE WHEN prjcts.Projection_WeekStartDate = si.SubInfo_CurrentReportingDate THEN prjcts.Projection_Hrs ELSE 0 END) AS Week1
+                      , SUM(CASE WHEN prjcts.Projection_WeekStartDate = DATEADD(WW,1,si.SubInfo_CurrentReportingDate)THEN prjcts.Projection_Hrs ELSE 0 END) AS Week2
+                      , SUM(CASE WHEN prjcts.Projection_WeekStartDate = DATEADD(WW,2,si.SubInfo_CurrentReportingDate) THEN prjcts.Projection_Hrs ELSE 0 END) AS Week3
+                      , SUM(CASE WHEN prjcts.Projection_WeekStartDate = DATEADD(WW,3,si.SubInfo_CurrentReportingDate) THEN prjcts.Projection_Hrs ELSE 0 END) AS Week4
+                      , si.SubInfo_CurrentReportingDate AS Date1
+                      , DATEADD(WW,1,si.SubInfo_CurrentReportingDate) AS Date2
+                      , DATEADD(WW,2,si.SubInfo_CurrentReportingDate) AS Date3
+                      , DATEADD(WW,3,si.SubInfo_CurrentReportingDate) AS Date4
+                      , Emp_Key
+                      , Prj_Key
+                 FROM dbo.Projections prjcts
+                 JOIN dbo.SubmissionInfo si
+                 ON prjcts.Projection_WeekStartDate BETWEEN si.SubInfo_CurrentReportingDate AND DATEADD(WW,3,SubInfo_CurrentReportingDate)
+                 GROUP BY Emp_Key, Prj_Key, si.SubInfo_CurrentReportingDate 
+                      , DATEADD(WW,1,si.SubInfo_CurrentReportingDate) 
+                      , DATEADD(WW,2,si.SubInfo_CurrentReportingDate)
+                      , DATEADD(WW,3,si.SubInfo_CurrentReportingDate)
+                )
+SELECT emp.Emp_Key
+     , emp.Emp_idno
+     , RTRIM(emp.Emp_LastName) + ', ' + RTRIM(emp.Emp_FirstName) + ' ' + RTRIM(emp.Emp_MiddleInitial) + '.' AS Emp_Name
+     , emp.Emp_Initials
+     , ISNULL(emp.Emp_CompanyUserName, emp.Emp_Key) AS Emp_CompanyUserName
+     , emp.Emp_PayFlg
+     , tm.Team_Key
+     , RTRIM(tml.Emp_LastName) + ', ' + RTRIM(tml.Emp_FirstName) + ' ' + RTRIM(tml.Emp_MiddleInitial) + '.' AS TML_Name
+     , tm.Team_Name
+     , PM.Emp_Key AS PM_Key
+     , PM.Emp_idno AS PM_Idno
+     , RTRIM(PM.Emp_LastName) + ', ' + RTRIM(PM.Emp_FirstName) + ' ' + RTRIM(PM.Emp_MiddleInitial) + '.' AS PM_Name
+     , Case when PM.Emp_LastName = 'Scanlon' then 'JS' else PM.Emp_Initials end AS PM_Initials
+     , PM.Emp_CompanyUserName AS PM_CompanyUserName
+     , PIC.Emp_Key AS PIC_Key
+     , PIC.Emp_idno AS PIC_Idno
+     , RTRIM(PIC.Emp_LastName) + ', ' + RTRIM(PIC.Emp_FirstName) + ' ' + RTRIM(PIC.Emp_MiddleInitial) + '.' AS PIC_Name
+     , PIC.Emp_Initials AS PIC_Initials
+     , PIC.Emp_CompanyUserName AS PIC_CompanyUserName
+	 , RTRIM(sup.Emp_LastName) + ', ' + RTRIM(sup.Emp_FirstName) + ' ' + RTRIM(sup.Emp_MiddleInitial) + '.' AS SUP_Name
+     , sup.Emp_Initials AS SUP_Initials
+     , sup.Emp_CompanyUserName AS SUP_CompanyUserName
+     , cli.Cli_Name
+     , radproj.Date1
+     , radproj.Date2
+     , radproj.Date3
+     , radproj.Date4
+     , radproj.Week1
+     , radproj.Week2
+     , radproj.Week3
+     , radproj.Week4
+     , prj.Prj_idno
+     , SUM(CASE WHEN prj.Prj_Type = 'D' THEN radproj.Week1 ELSE NULL END) OVER (PARTITION BY Emp.Emp_Key) DIRECT1
+     , SUM(CASE WHEN prj.Prj_Type = 'D' THEN radproj.Week2 ELSE NULL END) OVER (PARTITION BY Emp.Emp_Key) DIRECT2
+     , SUM(CASE WHEN prj.Prj_Type = 'D' THEN radproj.Week3 ELSE NULL END) OVER (PARTITION BY Emp.Emp_Key) DIRECT3
+     , SUM(CASE WHEN prj.Prj_Type = 'D' THEN radproj.Week4 ELSE NULL END) OVER (PARTITION BY Emp.Emp_Key) DIRECT4
+     , prj.Prj_Name
+FROM radproj
+JOIN dbo.Project prj   
+ON radproj.Prj_Key = prj.Prj_Key 
+JOIN dbo.Employee AS emp 
+ON radproj.Emp_Key = emp.Emp_Key 
+JOIN dbo.Employee AS PM 
+ON prj.PM_Key = PM.Emp_Key 
+LEFT JOIN dbo.Employee AS PIC 
+ON prj.PIC_Key = PIC.Emp_Key 
+JOIN Client AS cli 
+ON prj.Cli_Key = cli.Cli_Key 
+LEFT JOIN dbo.Team tm
+ON emp.Team_Key = tm.Team_Key
+LEFT JOIN dbo.Employee tml
+ON tm.Team_Leader = tml.Emp_idno
+Left Outer Join Employee sup
+on emp.Supervisor_Key = sup.Emp_Key
+WHERE 
+(
+((radproj.Week1 + radproj.Week2 + radproj.Week3 + radproj.Week4) &lt;&gt; 0)
+AND
+      -- -1 = No filter
+      (@ReportType = -1)
+      -- 0 = Individual Employee
+OR    ((@ReportType = 0) AND (ISNULL(emp.Emp_CompanyUserName, emp.Emp_Key) IN (@FilterList))) 
+      -- 1 = PM
+OR    ((@ReportType = 1) AND (PM.Emp_CompanyUserName IN (@FilterList)))
+      -- 2 = PIC
+OR    ((@ReportType = 2) AND (PIC.Emp_CompanyUserName IN (@FilterList)))
+      -- 3 = Team
+OR    ((@ReportType = 3) AND (CAST(tm.Team_Key AS VARCHAR) IN (@FilterList)))
+)</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Emp_Key">
+        <DataField>Emp_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Emp_idno">
+        <DataField>Emp_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Name">
+        <DataField>Emp_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Initials">
+        <DataField>Emp_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_CompanyUserName">
+        <DataField>Emp_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_PayFlg">
+        <DataField>Emp_PayFlg</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Team_Key">
+        <DataField>Team_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="TML_Name">
+        <DataField>TML_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Team_Name">
+        <DataField>Team_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_Key">
+        <DataField>PM_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PM_Idno">
+        <DataField>PM_Idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_Name">
+        <DataField>PM_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_Initials">
+        <DataField>PM_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_CompanyUserName">
+        <DataField>PM_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Key">
+        <DataField>PIC_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Idno">
+        <DataField>PIC_Idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Name">
+        <DataField>PIC_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Initials">
+        <DataField>PIC_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_CompanyUserName">
+        <DataField>PIC_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SUP_Name">
+        <DataField>SUP_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cli_Name">
+        <DataField>Cli_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SUP_Initials">
+        <DataField>SUP_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Date1">
+        <DataField>Date1</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="SUP_CompanyUserName">
+        <DataField>SUP_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Date2">
+        <DataField>Date2</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Date3">
+        <DataField>Date3</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Date4">
+        <DataField>Date4</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Week1">
+        <DataField>Week1</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Week2">
+        <DataField>Week2</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Week3">
+        <DataField>Week3</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Week4">
+        <DataField>Week4</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Prj_idno">
+        <DataField>Prj_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="DIRECT1">
+        <DataField>DIRECT1</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="DIRECT2">
+        <DataField>DIRECT2</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="DIRECT3">
+        <DataField>DIRECT3</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="DIRECT4">
+        <DataField>DIRECT4</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Name">
+        <DataField>Prj_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

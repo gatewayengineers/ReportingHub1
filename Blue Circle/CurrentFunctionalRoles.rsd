@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="CurrentFunctionalRoles">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <CommandText>
+SELECT Func_Key, Func_Name
+FROM (
+SELECT Func_Key, Func_Name
+FROM dbo.FunctionalRole fr
+WHERE EXISTS (SELECT 1
+              FROM dbo.FunctionalRoleAssignment fra
+              WHERE fra.Func_Key = fr.Func_Key
+              AND GetDate() BETWEEN fra.FuncRole_EffStartDate AND fra.FuncRole_EffEndDate)
+UNION ALL
+SELECT 1 AS Func_Key, 'Salaried Employee' AS Func_Name
+UNION ALL
+SELECT 2 AS Func_Key, 'Hourly Employee' AS Func_Name) lst
+ORDER BY Func_Name</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Func_Key">
+        <DataField>Func_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Func_Name">
+        <DataField>Func_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

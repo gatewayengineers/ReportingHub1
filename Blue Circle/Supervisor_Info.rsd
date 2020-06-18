@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="Supervisor_Info">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@OperationsReport">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@UserName">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>SELECT RTRIM(supv.Emp_CompanyUserName) AS Emp_CompanyUserName
+     , supv.Emp_Key
+     , dbo.Emp_Name_By_Key(supv.Emp_Key) AS Supervisor_Name
+FROM dbo.Employee supv
+JOIN dbo.Employee emp
+ON supv.Emp_Key = emp.Supervisor_Key
+WHERE emp.Emp_Status = 'Y'
+AND supv.Emp_Status = 'Y'
+AND   (
+                 (@OperationsReport = 1)
+              OR (@OperationsReport = 0 And supv.Emp_CompanyUserName = @UserName)
+)             
+GROUP BY RTRIM(supv.Emp_CompanyUserName) 
+       , supv.Emp_Key
+ORDER BY dbo.Emp_Name_By_Key(supv.Emp_Key)</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Emp_CompanyUserName">
+        <DataField>Emp_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Supervisor_Name">
+        <DataField>Supervisor_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Key">
+        <DataField>Emp_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

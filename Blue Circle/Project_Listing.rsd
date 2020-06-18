@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="Project_Listing">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>If getdate() &lt; DATEADD(wk, DATEDIFF(wk,0,getdate()), 1)
+SELECT dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+     , ms.MS_Name
+     , ms.MS_ID
+     , ms.MS_BDCode
+     , cli.Cli_Name
+     , cli.Cli_idno
+     , prj.Prj_idno
+     , prj.Prj_Name
+     , prj.Prj_Status
+     , PM.Emp_Initials AS PM_Initials
+     , PIC.Emp_Initials AS PIC_Initials
+     , MAX(inv.Inv_Date) AS Last_Inv_Date
+     , sum(inv_amt*-1) as Inv_Amt
+     , DATEADD(dd,1,EOMONTH(DATEADD(yy,-5,GetDate()),-1)) AS StartDate
+     , DATEADD(wk, -1, DATEADD(DAY, 3-DATEPART(WEEKDAY, getdate()), DATEDIFF(dd, 0, getdate()))) AS EndDate
+FROM dbo.Project prj
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.MarketSegment ms
+ON cli.MS_Key = ms.MS_Key
+LEFT joiN dbo.Invoice inv
+ON prj.Prj_Key = inv.Prj_Key
+joiN dbo.Employee PM
+ON PM.Emp_Key = prj.PM_Key
+joiN dbo.Employee PIC
+ON PIC.Emp_Key = prj.PIC_Key
+JOIN (SELECT DISTINCT prj_key
+      FROM dbo.Time
+      WHERE Tim_WrkDate BETWEEN DATEADD(dd,1,EOMONTH(DATEADD(yy,-5,GetDate()),-1)) AND DATEADD(wk, -1, DATEADD(DAY, 3-DATEPART(WEEKDAY, getdate()), DATEDIFF(dd, 0, getdate())))) lstwrkd
+ON prj.Prj_Key = lstwrkd.Prj_Key
+WHERE (inv.Inv_Key IS NuLL OR inv.Inv_IsCurrent = 1)
+AND   prj.Prj_Type = N'D'
+AND   (
+          (@ReportType = 1 AND ms.MS_Key IN (@FilterList))
+       OR (@ReportType = 2 AND cli.Cli_Key IN (@FilterList))
+      )
+GROUP BY dbo.Emp_Name_By_Key(ms.Emp_Key) 
+     , ms.MS_Name
+     , ms.MS_ID
+     , ms.MS_BDCode
+     , cli.Cli_Name
+     , cli.Cli_idno
+     , prj.Prj_idno
+     , prj.Prj_Name
+     ,prj.Prj_Status
+     , PM.Emp_Initials
+     , PIC.Emp_Initials
+else
+SELECT dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+     , ms.MS_Name
+     , ms.MS_ID
+     , ms.MS_BDCode
+     , cli.Cli_Name
+     , cli.Cli_idno
+     , prj.Prj_idno
+     , prj.Prj_Name
+     , prj.Prj_Status
+     , PM.Emp_Initials AS PM_Initials
+     , PIC.Emp_Initials AS PIC_Initials
+     , MAX(inv.Inv_Date) AS Last_Inv_Date
+     , sum(inv_amt*-1) as Inv_Amt
+     , DATEADD(dd,1,EOMONTH(DATEADD(yy,-5,GetDate()),-1)) AS StartDate
+     , DATEADD(wk, DATEDIFF(wk,0,getdate()), 1) AS EndDate
+FROM dbo.Project prj
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.MarketSegment ms
+ON cli.MS_Key = ms.MS_Key
+LEFT joiN dbo.Invoice inv
+ON prj.Prj_Key = inv.Prj_Key
+joiN dbo.Employee PM
+ON PM.Emp_Key = prj.PM_Key
+joiN dbo.Employee PIC
+ON PIC.Emp_Key = prj.PIC_Key
+JOIN (SELECT DISTINCT prj_key
+      FROM dbo.Time
+      WHERE Tim_WrkDate BETWEEN DATEADD(dd,1,EOMONTH(DATEADD(yy,-5,GetDate()),-1)) AND DATEADD(wk, DATEDIFF(wk,0,getdate()), 1)) lstwrkd
+ON prj.Prj_Key = lstwrkd.Prj_Key
+WHERE (inv.Inv_Key IS NuLL OR inv.Inv_IsCurrent = 1)
+AND   prj.Prj_Type = N'D'
+AND   (
+          (@ReportType = 1 AND ms.MS_Key IN (@FilterList))
+       OR (@ReportType = 2 AND cli.Cli_Key IN (@FilterList))
+      )
+GROUP BY dbo.Emp_Name_By_Key(ms.Emp_Key) 
+     , ms.MS_Name
+     , ms.MS_ID
+     , ms.MS_BDCode
+     , cli.Cli_Name
+     , cli.Cli_idno
+     , prj.Prj_idno
+     , prj.Prj_Name
+     ,prj.Prj_Status
+     , PM.Emp_Initials
+     , PIC.Emp_Initials</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="MSL_Name">
+        <DataField>MSL_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MS_Name">
+        <DataField>MS_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MS_ID">
+        <DataField>MS_ID</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MS_BDCode">
+        <DataField>MS_BDCode</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cli_Name">
+        <DataField>Cli_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cli_idno">
+        <DataField>Cli_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_idno">
+        <DataField>Prj_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Name">
+        <DataField>Prj_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Status">
+        <DataField>Prj_Status</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_Initials">
+        <DataField>PM_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Initials">
+        <DataField>PIC_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Last_Inv_Date">
+        <DataField>Last_Inv_Date</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Inv_Amt">
+        <DataField>Inv_Amt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="StartDate">
+        <DataField>StartDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="EndDate">
+        <DataField>EndDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="StatusGroup">
+        <Value>=IIF(Fields!Prj_Status.Value&lt;&gt;"A","I","A")</Value>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

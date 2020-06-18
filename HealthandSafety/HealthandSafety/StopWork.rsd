@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>HealthandSafety</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@id">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>select InternalID,CONVERT(DATE,SW_Date) SW_Date,SW_Team,SW_Location,SW_Check_Apply,SW_Description,imageDesc1,imageDesc2,imageDesc3,imageDesc4,position,imagename,ImageFiles.contenttype,data from Stop_Work Left Outer Join ImageFiles on InternalID = idno and Stop_Work.type = ImageFiles.type where InternalID = @id</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="InternalID">
+        <DataField>InternalID</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="SW_Date">
+        <DataField>SW_Date</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="SW_Team">
+        <DataField>SW_Team</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SW_Location">
+        <DataField>SW_Location</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SW_Check_Apply">
+        <DataField>SW_Check_Apply</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SW_Description">
+        <DataField>SW_Description</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="imageDesc1">
+        <DataField>imageDesc1</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="imageDesc2">
+        <DataField>imageDesc2</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="imageDesc3">
+        <DataField>imageDesc3</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="imageDesc4">
+        <DataField>imageDesc4</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="position">
+        <DataField>position</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="imagename">
+        <DataField>imagename</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="contenttype">
+        <DataField>contenttype</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="data">
+        <DataField>data</DataField>
+        <rd:TypeName>System.Byte[]</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

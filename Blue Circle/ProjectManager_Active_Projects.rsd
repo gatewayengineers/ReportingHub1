@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <CommandText>select
+Project.Prj_idno
+,Project.Prj_Name
+,Client.Cli_Name
+,EmpPM.Emp_idno
+,(EmpPM.Emp_LastName + ', ' + EmpPM.Emp_FirstName + ' ' + EmpPM.Emp_MiddleInitial + '.') as PMName
+,EmpPIC.Emp_Initials as PICInitials
+,RTRIM(EmpPM.Emp_CompanyUserName) as Emp_User
+FROM Project
+INNER JOIN
+Employee as EmpPM 
+ON EmpPM.Emp_Key = Project.PM_Key
+INNER JOIN
+Employee as EmpPIC
+ON EmpPIC.Emp_Key = Project.PIC_Key
+INNER JOIN
+Client ON Client.Cli_Key = Project.Cli_Key
+WHERE
+Project.Prj_Status = 'A'
+ORDER BY
+Project.Prj_idno
+</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Prj_idno">
+        <DataField>Prj_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Name">
+        <DataField>Prj_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cli_Name">
+        <DataField>Cli_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_idno">
+        <DataField>Emp_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PMName">
+        <DataField>PMName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PICInitials">
+        <DataField>PICInitials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_User">
+        <DataField>Emp_User</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

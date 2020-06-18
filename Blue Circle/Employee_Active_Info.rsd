@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <CommandText>select
+dbo.Emp_Name_By_Key(emp.Emp_Key) as EmployeeName
+,ISNULL(RTRIM(emp.Emp_CompanyUserName),emp.Emp_Key) AS Emp_CompanyUserName
+,dbo.Emp_Name_By_Key(EmpSup.Emp_Key) as SupervisorName
+,EmpSup.Emp_Key AS SupervisorEmpKey
+,dbo.Emp_Name_By_Idno(tm.Team_Leader) as TeamLeaderName
+,tm.Team_Key
+,tm.Team_Leader
+,tm.Team_Name
+,emp.Emp_idno
+,emp.Emp_Initials
+,emp.Emp_PayFlg
+,Staff.Stf_name
+,Staff.Stf_Order
+,CASE WHEN Staff.Stf_Order = 1 then 1 WHEN Staff.Stf_Order = 131 then 2 WHEN Staff.Stf_Order = 2 then 3 WHEN Staff.Stf_Order = 3 then 4 WHEN Staff.Stf_Order = 4 then 5 
+WHEN Staff.Stf_Order = 5 then 6 WHEN Staff.Stf_Order = 6 then 7 WHEN Staff.Stf_Order = 7 then 8 WHEN Staff.Stf_Order = 8 then 9 WHEN Staff.Stf_Order = 9 then 10 else 11 end as Position 
+,emp.Emp_CompanyMobile
+,emp.Emp_Cell as Emp_PersonalMobile
+,emp.Emp_Phone as Emp_HomePhone
+,emp.Emp_CompanyEmail
+,emp.Emp_PersonalEmail
+,ISNULL(NULLIF(emp.Emp_Addr1,'') + CHAR(10),'') + 
+ ISNULL(NULLIF(emp.Emp_Addr2,'') + CHAR(10),'') + 
+ emp.Emp_City + ', ' + emp.Emp_State + ' ' + emp.Emp_Zip as FullAddress
+,emp.Emp_SafetyTier
+,ubdg.Util_BdgDirect AS DirectUtilizationBudget
+FROM Employee emp
+JOIN Employee as EmpSup 
+ON   EmpSup.Emp_Key = emp.Supervisor_Key
+Left Outer JOIN Team tm
+ON tm.Team_Key = emp.Team_Key
+LEFT JOIN StaffTypes Staff 
+ON Staff.Stf_Key = emp.Stf_Key
+LEFT JOIN dbo.UtilizationBudget ubdg
+ON emp.Emp_Key = ubdg.Emp_Key
+AND ubdg.Util_BdgYear = YEAR(GetDatE())
+Where (emp.Emp_Status = 'Y') and (emp.Emp_Key not in (34,299,160)) 
+--Or (emp.Emp_Status = 'N' and emp.Emp_EndDate = '1899-12-30') and (emp.Emp_Key not in 34,299,160))
+ORDER BY dbo.Emp_Name_By_Key(emp.Emp_Key)</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="EmployeeName">
+        <DataField>EmployeeName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_CompanyUserName">
+        <DataField>Emp_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SupervisorName">
+        <DataField>SupervisorName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SupervisorEmpKey">
+        <DataField>SupervisorEmpKey</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="TeamLeaderName">
+        <DataField>TeamLeaderName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Team_Key">
+        <DataField>Team_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Team_Leader">
+        <DataField>Team_Leader</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Team_Name">
+        <DataField>Team_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_idno">
+        <DataField>Emp_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Initials">
+        <DataField>Emp_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_PayFlg">
+        <DataField>Emp_PayFlg</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Stf_name">
+        <DataField>Stf_name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Stf_Order">
+        <DataField>Stf_Order</DataField>
+        <rd:TypeName>System.Int16</rd:TypeName>
+      </Field>
+      <Field Name="Position">
+        <DataField>Position</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Emp_CompanyMobile">
+        <DataField>Emp_CompanyMobile</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_PersonalMobile">
+        <DataField>Emp_PersonalMobile</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_HomePhone">
+        <DataField>Emp_HomePhone</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_CompanyEmail">
+        <DataField>Emp_CompanyEmail</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_PersonalEmail">
+        <DataField>Emp_PersonalEmail</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="FullAddress">
+        <DataField>FullAddress</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_SafetyTier">
+        <DataField>Emp_SafetyTier</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="DirectUtilizationBudget">
+        <DataField>DirectUtilizationBudget</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

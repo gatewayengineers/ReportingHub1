@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="User_Info_By_Role">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@FunctionalRole">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+        </DataSetParameter>
+        <DataSetParameter Name="@OperationsReport">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@UserName">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>SELECT Emp_CompanyUserName, Emp_Name
+FROM (
+SELECT     ISNULL(RTRIM(Emp_CompanyUserName),emp.Emp_Key) AS Emp_CompanyUserName, emp.Emp_LastName + ', ' + emp.Emp_FirstName + ' ' + emp.Emp_MiddleInitial + '.' AS Emp_Name
+FROM         Employee AS emp INNER JOIN
+                      FunctionalRoleAssignment AS fra ON emp.Emp_Key = fra.Emp_Key AND fra.Func_Key = @FunctionalRole
+WHERE     ((emp.Emp_Status = N'Y') AND GETDATE() BETWEEN fra.FuncRole_EffStartDate AND fra.FuncRole_EffEndDate)
+AND ((@OperationsReport = 1) OR
+    (@OperationsReport = 0 AND emp.Emp_CompanyUserName = @UserName))
+UNION ALL
+SELECT ISNULL(RTRIM(Emp_CompanyUserName),emp.Emp_Key) AS Emp_CompanyUserName, emp.Emp_LastName + ', ' + emp.Emp_FirstName + ' ' + emp.Emp_MiddleInitial + '.' AS Emp_Name
+FROM dbo.Employee emp
+WHERE      ((emp.Emp_Status = N'Y') AND @FunctionalRole = 1 aND emp.Emp_PayFlg = N'S')
+AND ((@OperationsReport = 1) OR
+    (@OperationsReport = 0 AND emp.Emp_CompanyUserName = @UserName))
+UNION ALL
+SELECT ISNULL(RTRIM(Emp_CompanyUserName),emp.Emp_Key) AS Emp_CompanyUserName, emp.Emp_LastName + ', ' + emp.Emp_FirstName + ' ' + emp.Emp_MiddleInitial + '.' AS Emp_Name
+FROM dbo.Employee emp
+WHERE      ((emp.Emp_Status = N'Y') AND @FunctionalRole = 2 aND emp.Emp_PayFlg = N'H')
+AND ((@OperationsReport = 1) OR
+    (@OperationsReport = 0 AND emp.Emp_CompanyUserName = @UserName))
+) lst
+ORDER BY Emp_Name</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Emp_CompanyUserName">
+        <DataField>Emp_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Name">
+        <DataField>Emp_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "HealthandSafety", "HealthandSafety\HealthandSafety.rptproj", "{8A04FEC4-4132-4CD5-8F04-711D3F9F969C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		DebugLocal|Default = DebugLocal|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A04FEC4-4132-4CD5-8F04-711D3F9F969C}.Debug|Default.ActiveCfg = Debug
+		{8A04FEC4-4132-4CD5-8F04-711D3F9F969C}.Debug|Default.Build.0 = Debug
+		{8A04FEC4-4132-4CD5-8F04-711D3F9F969C}.Debug|Default.Deploy.0 = Debug
+		{8A04FEC4-4132-4CD5-8F04-711D3F9F969C}.DebugLocal|Default.ActiveCfg = DebugLocal
+		{8A04FEC4-4132-4CD5-8F04-711D3F9F969C}.DebugLocal|Default.Build.0 = DebugLocal
+		{8A04FEC4-4132-4CD5-8F04-711D3F9F969C}.Release|Default.ActiveCfg = Release
+		{8A04FEC4-4132-4CD5-8F04-711D3F9F969C}.Release|Default.Build.0 = Release
+		{8A04FEC4-4132-4CD5-8F04-711D3F9F969C}.Release|Default.Deploy.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

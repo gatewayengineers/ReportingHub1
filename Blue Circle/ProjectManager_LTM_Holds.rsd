@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@PM_Key">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>-- necessary for when PM has no holds
+DECLARE @UserName NVARCHAR(125)
+SELECT @UserName = emp.Emp_CompanyUserName
+FROM dbo.Employee emp
+WHERE emp.Emp_Key = @PM_Key
+If GETDATE() &lt; dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,GETDATE()),GETDATE())), 1))
+select FORMAT(rpd.FullDate,'MMMM yyyy') AS Hold_Date
+, DATEADD(dd,1,EOMONTH(rpd.FullDate,-1)) AS Month
+, @UserName AS Emp_User
+, ISNULL(SUM(Hold_Amount),0) as HoldAmount
+FROM dbo.ReportingDates rpd
+LEFT JOIN (dbo.Hold hld
+JOIN dbo.Project prj 
+ON prj.Prj_idno = hld.Hold_Project 
+JOIN dbo.Employee PM
+ON prj.PM_Key = PM.Emp_Key
+AND PM.Emp_key = @PM_Key
+)
+ON rpd.FullDate = DATEADD(dd,1,EOMONTH(hld.Hold_Date,-1))
+WHERE rpd.DayOfMonth = 1
+AND (rpd.FullDate &gt;= EOMONTH(DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1),-13)
+AND rpd.FullDate &lt; EOMONTH(DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1),-1))
+GROUP BY FORMAT(rpd.FullDate,'MMMM yyyy') 
+       , DATEADD(dd,1,EOMONTH(rpd.FullDate,-1))
+       --, PM.Emp_CompanyUserName
+Order by DATEADD(dd,1,EOMONTH(rpd.FullDate,-1))
+else
+select FORMAT(rpd.FullDate,'MMMM yyyy') AS Hold_Date
+, DATEADD(dd,1,EOMONTH(rpd.FullDate,-1)) AS Month
+, @UserName AS Emp_User
+, ISNULL(SUM(Hold_Amount),0) as HoldAmount
+FROM dbo.ReportingDates rpd
+LEFT JOIN (dbo.Hold hld
+JOIN dbo.Project prj 
+ON prj.Prj_idno = hld.Hold_Project 
+JOIN dbo.Employee PM
+ON prj.PM_Key = PM.Emp_Key
+AND PM.Emp_key = @PM_Key
+)
+ON rpd.FullDate = DATEADD(dd,1,EOMONTH(hld.Hold_Date,-1))
+WHERE rpd.DayOfMonth = 1
+AND (rpd.FullDate &gt;= DATEADD(dd,1,EOMONTH(GetDate(),-13)) 
+AND rpd.FullDate &lt; DATEADD(dd,1,EOMONTH(GetDate(),-1)))
+GROUP BY FORMAT(rpd.FullDate,'MMMM yyyy') 
+       , DATEADD(dd,1,EOMONTH(rpd.FullDate,-1))
+       --, PM.Emp_CompanyUserName
+Order by DATEADD(dd,1,EOMONTH(rpd.FullDate,-1))</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Hold_Date">
+        <DataField>Hold_Date</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Month">
+        <DataField>Month</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Emp_User">
+        <DataField>Emp_User</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="HoldAmount">
+        <DataField>HoldAmount</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

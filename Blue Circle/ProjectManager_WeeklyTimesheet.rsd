@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>SELECT 'Time' as Section,
+       empPM.Emp_FirstName AS PMFIRST, 
+       empPM.Emp_LastName AS PMLAST, 
+       empPM.Emp_MiddleInitial AS PMMIDDLEI, 
+       stftyp.Stf_idno, 
+       stftyp.Stf_Name, 
+       stftyp.Stf_Order, 
+       empPM.Emp_Initials, 
+       prj.Prj_idno, 
+       prj.Prj_Name, 
+      CASE when prj.Prj_idno Like 'I-%' then ''
+	   WHEN prj.Prj_BillingWeek = 'WK_Blue' and prj.Prj_idno not Like 'I-%' THEN 'Blue'
+                                WHEN prj.Prj_BillingWeek = 'WK_Orange' THEN 'Orange'
+                                WHEN prj.Prj_BillingWeek = 'WK3' THEN 'Inactive'
+                                WHEN prj.Prj_BillingWeek = 'WK_Aqua' THEN 'Aqua'
+								WHEN prj.Prj_BillingWeek = 'WK_Green' THEN 'Green'
+                                WHEN prj.Prj_BillingWeek = 'WKL' THEN 'Week L'
+                                WHEN prj.Prj_BillingWeek = '   ' THEN 'Week ''   '''
+								ELSE 'NULL' END AS Prj_BillingWeekText,
+       cli.Cli_Name, 
+       tim.Tim_WrkHrs AS SectionValue, 
+       tim.Tim_WrkDate AS SectionDate, 
+       tim.Tim_OvrFlg, 
+       tim.Tim_Notes AS SectionNotes, 
+       phs.Phs_idno AS Phs_Idno, 
+       rptdt.RptWeekStartDate AS START, 
+       rptdt.RptWeekEndDate AS ENDD, 
+       emp.Emp_LastName, 
+       SUBSTRING(emp.Emp_FirstName, 1, 1) AS Emp_firstinitial, 
+       empPM.Emp_CompanyUserName AS Emp_User
+FROM   Time tim
+       JOIN Project prj
+       ON prj.Prj_Key = tim.Prj_Key 
+       JOIN Employee emp
+       ON emp.Emp_Key = tim.Emp_Key 
+       JOIN StaffTypes stftyp 
+       ON stftyp.Stf_Key = tim.Stf_Key 
+       JOIN Phase phs
+       ON phs.Phs_Key = tim.Phs_Key 
+       JOIN Employee empPM 
+       ON empPM.Emp_Key = prj.PM_Key 
+       JOIN ReportingDates rptdt 
+       ON rptdt.FullDate = tim.Tim_WrkDate 
+       JOIN Client cli 
+       ON cli.Cli_Key = prj.Cli_Key
+WHERE  (tim.Tim_IsCurrent = 1) 
+AND (empPM.Emp_Key IN (@FilterList))
+and ((PRJ.Prj_idno like 'C-%') OR (PRJ.Prj_idno like 'I-%') OR (PRJ.Prj_idno like 'P-%') OR (PRJ.Prj_idno like 'S-' + RIGHT(year(getdate()),2) + '-%') OR (PRJ.Prj_idno like 'BD-' + RIGHT(year(getdate()),2) + '-%') OR (PRJ.Prj_idno like 'X-%') OR (PRJ.Prj_idno like 'X-%') OR (prj.Prj_idno Like 'PSS-%' AND LEN(PRJ.prj_idno) = 13))
+AND   (tim.Tim_WrkDate BETWEEN
+                          (SELECT     DATEADD(wk, - 1, RptWeekStartDate) AS Expr1
+                            FROM          ReportingDates AS ReportingDates_2
+                            WHERE      (FullDate = CAST(GETDATE() AS Date))) AND
+                          (SELECT     DATEADD(wk, - 1, RptWeekEndDate) AS Expr1
+                            FROM          ReportingDates AS ReportingDates_1
+                            WHERE      (FullDate = CAST(GETDATE() AS Date)))) 
+UNION ALL
+
+SELECT 'Expenses' AS Section,
+       empPM.Emp_FirstName AS PMFIRST, 
+       empPM.Emp_LastName AS PMLAST, 
+       empPM.Emp_MiddleInitial AS PMMIDDLEI, 
+       NULL AS Stf_idno, 
+       NULL AS Stf_Name, 
+       NULL AS Stf_Order, 
+       empPM.Emp_Initials, 
+       prj.Prj_idno, 
+       prj.Prj_Name, 
+       CASE when prj.Prj_idno Like 'I-%' then ''
+	   WHEN prj.Prj_BillingWeek = 'WK1' and prj.Prj_idno not Like 'I-%' THEN 'Week 1'
+                                WHEN prj.Prj_BillingWeek = 'WK2' THEN 'Week 2'
+                                WHEN prj.Prj_BillingWeek = 'WK3' THEN 'Week 3'
+                                WHEN prj.Prj_BillingWeek = 'WK4' THEN 'Week 4'
+								WHEN prj.Prj_BillingWeek = 'WK5' THEN 'Month 5'
+                                WHEN prj.Prj_BillingWeek = 'WKL' THEN 'Week L'
+                                WHEN prj.Prj_BillingWeek = '   ' THEN 'Week ''   '''
+								ELSE 'NULL' END AS Prj_BillingWeekText,
+       cli.Cli_Name, 
+       (cst.Exp_CstPerUnit * cst.Exp_NumberOfUnits) AS SectionValue, 
+       cst.Exp_Date AS SectionDate, 
+       NULL AS Tim_OvrFlg, 
+       cst.Exp_LineNotes + ' - ' + cst.Exp_PayeeName AS SectionNotes, 
+       phs.Phs_idno AS Phs_Idno, 
+       rptdt.RptWeekStartDate AS START, 
+       rptdt.RptWeekEndDate AS ENDD, 
+       NULL AS Emp_LastName, 
+       NULL AS Emp_firstinitial, 
+       empPM.Emp_CompanyUserName AS Emp_User
+        --, Phs_OWIP    = SUM(CASE WHEN cst.Exp_Status IN ('R','H','D') THEN cst.Exp_TotalForItem ELSE 0 END)
+       FROM dbo.Expense cst
+        JOIN dbo.Project prj
+       ON cst.Prj_Key = prj.Prj_Key
+       JOIN Phase phs
+       ON phs.Phs_Key = cst.Phs_Key 
+       JOIN Employee empPM 
+       ON empPM.Emp_Key = prj.PM_Key 
+       JOIN ReportingDates rptdt 
+       ON rptdt.FullDate = cst.Exp_Date
+       JOIN Client cli 
+       ON cli.Cli_Key = prj.Cli_Key
+  WHERE cst.Exp_IsCurrent = 1
+  AND prj.PM_Key IN (@FilterList)
+  and ((PRJ.Prj_idno like 'C-%') OR (PRJ.Prj_idno like 'I-%') OR (PRJ.Prj_idno like 'P-%') OR (PRJ.Prj_idno like 'S-' + RIGHT(year(getdate()),2) + '-%') OR (PRJ.Prj_idno like 'BD-' + RIGHT(year(getdate()),2) + '-%') OR (PRJ.Prj_idno like 'X-%') OR (prj.Prj_idno Like 'PSS-%' AND LEN(PRJ.prj_idno) = 13)) 
+  AND (cst.Exp_Date BETWEEN (SELECT     DATEADD(wk, - 1, RptWeekStartDate) AS Expr1
+                            FROM          ReportingDates AS ReportingDates_2
+                            WHERE      (FullDate = CAST(GETDATE() AS Date))) AND
+                          (SELECT     DATEADD(wk, - 1, RptWeekEndDate) AS Expr1
+                            FROM          ReportingDates AS ReportingDates_1
+                            WHERE      (FullDate = CAST(GETDATE() AS Date))))</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="PMFIRST">
+        <DataField>PMFIRST</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Section">
+        <DataField>Section</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PMLAST">
+        <DataField>PMLAST</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PMMIDDLEI">
+        <DataField>PMMIDDLEI</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Stf_idno">
+        <DataField>Stf_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Stf_Name">
+        <DataField>Stf_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Stf_Order">
+        <DataField>Stf_Order</DataField>
+        <rd:TypeName>System.Int16</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Initials">
+        <DataField>Emp_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="prj_idno">
+        <DataField>Prj_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Name">
+        <DataField>Prj_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cli_Name">
+        <DataField>Cli_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_BillingWeekText">
+        <DataField>Prj_BillingWeekText</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SectionValue">
+        <DataField>SectionValue</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Tim_OvrFlg">
+        <DataField>Tim_OvrFlg</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SectionDate">
+        <DataField>SectionDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="START">
+        <DataField>START</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="SectionNotes">
+        <DataField>SectionNotes</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="ENDD">
+        <DataField>ENDD</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Phs_Idno">
+        <DataField>Phs_Idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_LastName">
+        <DataField>Emp_LastName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_firstinitial">
+        <DataField>Emp_firstinitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_User">
+        <DataField>Emp_User</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_NAME">
+        <Value>=RTRIM(Fields!PMLAST.Value) + ", " + RTRIM(Fields!PMFIRST.Value) + " " + RTRIM(Fields!PMMIDDLEI.Value) + "."</Value>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

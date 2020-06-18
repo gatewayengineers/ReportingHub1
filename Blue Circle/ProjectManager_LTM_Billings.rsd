@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@PM_Key">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>If GETDATE() &lt; dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,GETDATE()),GETDATE())), 1))
+SELECT rpd.FullDate AS Inv_Date
+     , ISNULL(bill.Billings,0) AS Billings
+FROM dbo.ReportingDates rpd
+LEFT JOIN (
+SELECT DATEADD(m, DATEDIFF(m, 0, inv.Inv_Date), 0) as Inv_Date
+     , SUM(inv.Inv_Amt) * - 1 AS Billings
+FROM  dbo.Invoice inv
+JOIN dbo.Project prj
+ON prj.Prj_Key = inv.Prj_Key 
+JOIN dbo.Employee emp
+ON emp.Emp_Key = prj.PM_Key
+WHERE     (inv.Inv_IsCurrent = 1) 
+AND (inv.Inv_Date BETWEEN DATEADD(dd, 1, EOMonth(GETDATE(), - 14)) AND EOMonth(GETDATE(), - 1)) 
+AND (prj.PM_Key = @PM_Key)
+GROUP BY DATEADD(m, DATEDIFF(m, 0, inv.Inv_Date), 0)
+) bill
+ON rpd.FullDate = bill.Inv_Date
+WHERE rpd.FullDate &gt; EOMONTH(DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1),-13)
+AND rpd.FullDate &lt; EOMONTH(DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1),-1)
+AND DAY(rpd.FullDate) = 1
+Order By Inv_Date
+Else 
+SELECT rpd.FullDate AS Inv_Date
+     , ISNULL(bill.Billings,0) AS Billings
+FROM dbo.ReportingDates rpd
+LEFT JOIN (
+SELECT DATEADD(m, DATEDIFF(m, 0, inv.Inv_Date), 0) as Inv_Date
+     , SUM(inv.Inv_Amt) * - 1 AS Billings
+FROM  dbo.Invoice inv
+JOIN dbo.Project prj
+ON prj.Prj_Key = inv.Prj_Key 
+JOIN dbo.Employee emp
+ON emp.Emp_Key = prj.PM_Key
+WHERE     (inv.Inv_IsCurrent = 1) 
+AND (inv.Inv_Date BETWEEN DATEADD(dd, 1, EOMonth(GETDATE(), - 13)) AND EOMonth(GETDATE(), - 1)) 
+AND (prj.PM_Key = @PM_Key)
+GROUP BY DATEADD(m, DATEDIFF(m, 0, inv.Inv_Date), 0)
+) bill
+ON rpd.FullDate = bill.Inv_Date
+WHERE rpd.FullDate &gt; EOMONTH(GetDate(),-13)
+AND rpd.FullDate &lt;= EOMONTH(GetDate(),-1)
+AND DAY(rpd.FullDate) = 1
+Order By Inv_Date</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Inv_Date">
+        <DataField>Inv_Date</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Billings">
+        <DataField>Billings</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

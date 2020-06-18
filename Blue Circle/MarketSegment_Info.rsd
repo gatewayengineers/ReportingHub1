@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@OperationsReport">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@UserName">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>SELECT ms.MS_Key
+     , ms.MS_ID
+     , ms.MS_Name
+     , ms.MS_BDCode
+     , ms.Emp_Key
+     , dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+	 ,emp.Emp_CompanyUserName
+FROM dbo.MarketSegment ms
+JOIN dbo.Employee emp
+ON ms.Emp_Key = emp.Emp_Key
+WHERE (@OperationsReport = 1 and ms.MS_Key &lt;= 12
+OR @OperationsReport = 0 AND Emp_CompanyUserName = @UserName and ms.MS_Key &lt;= 12)
+Order By MS_Key</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="MS_Key">
+        <DataField>MS_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="MS_ID">
+        <DataField>MS_ID</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MS_Name">
+        <DataField>MS_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MS_BDCode">
+        <DataField>MS_BDCode</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_Key">
+        <DataField>Emp_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="MSL_Name">
+        <DataField>MSL_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_CompanyUserName">
+        <DataField>Emp_CompanyUserName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

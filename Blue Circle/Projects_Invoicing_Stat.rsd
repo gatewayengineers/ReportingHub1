@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="Projects_LTM_Invoicing_Stat">
+    <Query>
+      <DataSourceReference>Gateway_ODS</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@LTMFlg">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:UserDefined>true</rd:UserDefined>
+          <rd:DbType>Int32</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@StartDate">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:UserDefined>true</rd:UserDefined>
+          <rd:DbType>DateTime</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@EndDate">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:UserDefined>true</rd:UserDefined>
+          <rd:DbType>DateTime</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>SELECT SUM(inv.inv_amt * -1) as Inv_Amt
+     , DATENAME(MM,inv.Inv_Date) as MON
+     , YEAR(inv.Inv_Date) as YR
+     , MONTH(inv.Inv_Date) as Month_Of_Year
+     , dbo.Emp_Name_By_Key(pm.Emp_Key) AS PM_Name
+     , dbo.Emp_Name_By_Key(pic.Emp_Key) AS PIC_Name
+FROM dbo.Project prj
+JOIN dbo.Invoice inv
+ON prj.Prj_Key = inv.Prj_Key
+JOIN dbo.Employee pm
+ON prj.PM_Key = pm.Emp_Key
+LEFT JOIN dbo.Employee pic
+ON prj.PIC_Key = pic.Emp_Key
+WHERE inv.Inv_IsCurrent = 1
+AND (inv.inv_date &gt;= CASE WHEN @StartDate IS NOT NULL THEN @StartDate
+                          WHEN @LTMFlg = 0 THEN DATEADD(dd,1,EOMontH(GETDATE(),-MONTH(GetDate())))
+                          ELSE DATEADD(dd,1,EOMontH(GETDATE(),-13)) END)
+AND inv.inv_date &lt; CASE WHEN @EndDate IS NOT NULL THEN DATEADD(dd,1,@EndDate)
+                        ELSE DATEADD(dd,1,EOMontH(GETDATE(),-1)) END
+AND ((@ReportType = 1 AND prj.PM_Key IN (@FilterList))
+OR (@ReportType = 2 AND prj.PIC_Key IN (@FilterList)))
+GROUP BY DATENAME(MM,inv.Inv_Date)
+     , YEAR(inv.Inv_Date) 
+     , MONTH(inv.Inv_Date)
+     , dbo.Emp_Name_By_Key(pm.Emp_Key)
+     , dbo.Emp_Name_By_Key(pic.Emp_Key)</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Inv_Amt">
+        <DataField>Inv_Amt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="MON">
+        <DataField>MON</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="YR">
+        <DataField>YR</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Month_Of_Year">
+        <DataField>Month_Of_Year</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PM_Name">
+        <DataField>PM_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Name">
+        <DataField>PIC_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

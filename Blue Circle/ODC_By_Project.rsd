@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@Project">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>Select
+ISNULL(Exp_PayeeName, '') AS Exp_PayeeName
+,Exp_Date
+,Exp_NumberOfUnits
+,Exp_CstPerUnit
+,Exp_TotalForItem
+,Phase.Phs_Name
+,Phase.Phs_idno
+,Project.Prj_idno AS Exp_project
+FROM Expense
+INNER JOIN 
+Phase ON Expense.Phs_Key = Phase.Phs_Key
+INNER JOIN
+Project ON Project.Prj_Key = Expense.Prj_Key
+
+WHERE
+Expense.Exp_IsCurrent = 1
+AND
+Project.Prj_idno IN (@Project)</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Exp_PayeeName">
+        <DataField>Exp_PayeeName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Exp_Date">
+        <DataField>Exp_Date</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Exp_NumberOfUnits">
+        <DataField>Exp_NumberOfUnits</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Exp_CstPerUnit">
+        <DataField>Exp_CstPerUnit</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Exp_TotalForItem">
+        <DataField>Exp_TotalForItem</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Exp_project">
+        <DataField>Exp_project</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Phs_Name">
+        <DataField>Phs_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Phs_idno">
+        <DataField>Phs_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

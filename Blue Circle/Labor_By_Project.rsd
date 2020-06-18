@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@Project">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>Select
+Employee.Emp_FirstName
+,Employee.Emp_LastName
+,Employee.Emp_idno as EmpID
+,StaffTypes.Stf_Name
+,StaffTypes.Stf_Order
+,Tim_Status
+,Tim_WrkHrs
+,Tim_BilHrs
+,Tim_WrkDate
+,Tim_PayRate
+,Tim_DilRate
+,Tim_BilRate
+,Tim_OvrFlg
+,Tim_Notes
+,Tim_WrkHrs * Tim_DilRate AS COST
+,Tim_BilHrs * Tim_BilRate AS BILLABLE
+,Phase.Phs_Name
+,Phase.Phs_idno
+,Project.Prj_idno as Tim_prj
+FROM Time
+INNER JOIN
+Employee ON Employee.Emp_Key = Time.Emp_Key
+INNER JOIN
+Phase ON Phase.Phs_Key = Time.Phs_Key
+INNER JOIN
+Project ON Project.Prj_Key = Time.Prj_Key
+INNER JOIN
+StaffTypes ON StaffTypes.Stf_Key = Time.Stf_Key
+WHERE
+Time.Tim_IsCurrent = 1
+AND
+Project.Prj_idno IN (@Project)</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Emp_FirstName">
+        <DataField>Emp_FirstName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_LastName">
+        <DataField>Emp_LastName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="EmpID">
+        <DataField>EmpID</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Stf_Name">
+        <DataField>Stf_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Tim_Status">
+        <DataField>Tim_Status</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Stf_Order">
+        <DataField>Stf_Order</DataField>
+        <rd:TypeName>System.Int16</rd:TypeName>
+      </Field>
+      <Field Name="Tim_WrkHrs">
+        <DataField>Tim_WrkHrs</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Tim_BilHrs">
+        <DataField>Tim_BilHrs</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Tim_WrkDate">
+        <DataField>Tim_WrkDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Tim_PayRate">
+        <DataField>Tim_PayRate</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Tim_DilRate">
+        <DataField>Tim_DilRate</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Tim_BilRate">
+        <DataField>Tim_BilRate</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Tim_OvrFlg">
+        <DataField>Tim_OvrFlg</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Tim_Notes">
+        <DataField>Tim_Notes</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="COST">
+        <DataField>COST</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="BILLABLE">
+        <DataField>BILLABLE</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_Name">
+        <DataField>Phs_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Phs_idno">
+        <DataField>Phs_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Tim_prj">
+        <DataField>Tim_prj</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

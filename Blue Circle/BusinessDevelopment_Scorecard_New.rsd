@@ -1,0 +1,934 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@RptDate">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:UserDefined>true</rd:UserDefined>
+        </DataSetParameter>
+        <DataSetParameter Name="@ReportType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>DECLARE @YearStartDate DATE, @MonthStartDate DATE, @EndDate DATE,@EndDate1 Date,@YearStartDate1 Date,@MonthStartDate1 Date
+
+select @YearStartDate = case when MONTH(getdate()) = 1 then dateadd(year,datediff(Year,0, DATEADD(MONTH, DATEDIFF(MONTH, -1, @RptDate)-1, -1)),0) else dateadd(year,datediff(Year,0, DATEADD(MONTH, DATEDIFF(MONTH, -1, @RptDate)-1, 0)),0) end 
+select @MonthStartDate = CASE WHEN @RptDate &lt;= dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1)) then DATEADD(MONTH, DATEDIFF(MONTH, 0, @RptDate)-2, 0) else DATEADD(MONTH, DATEDIFF(MONTH, 0, @RptDate)-1, 0) end
+select @EndDate = CASE WHEN @RptDate &lt;= dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1)) then DATEADD(MONTH, DATEDIFF(MONTH, -2, @RptDate)-2, -1) else DATEADD(MONTH, DATEDIFF(MONTH, -1, @RptDate)-1, -1) end
+
+SELECT @YearStartDate1 = strtdts.YearStartDate, @MonthStartDate1 = strtdts.MonthStartDate, @EndDate1 = psscur.EndDate
+            FROM (SELECT MIN(Extract_Date) AS YearStartDate, MAX(CASE WHEN yrendchk.cnt &gt; 1 THEN Extract_Date ELSE DATEADD(mm,-1,Extract_Date) END) AS MonthStartDate, MAX(cnt) cnt
+                  FROM dbo.ProjectStatisticsSnapshot pss
+                  CROSS JOIN (SELECT COUNT(DISTINCT Extract_Date) cnt
+                              FROM dbo.ProjectStatisticsSnapshot pss
+                              WHERE pss.Extract_Date &gt;= DATEFROMPARTS(YEAR(@RptDate),1,1)
+                              AND pss.Extract_Date &lt;= case when @RptDate &lt;= dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1)) 
+then dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,Dateadd(month,-1,@RptDate)),Dateadd(month,-1,@RptDate))), 1))
+when @RptDate &gt;= dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1))
+then dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1)) end) yrendchk
+                  WHERE pss.Extract_Date &gt;= DATEFROMPARTS(CASE WHEN yrendchk.cnt IN (0,1) THEN -1 ELSE 0 END +  YEAR(@RptDate),1,1)
+                  AND pss.Extract_Date &lt; case when @RptDate &lt;= dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1)) 
+then dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,Dateadd(month,-1,@RptDate)),Dateadd(month,-1,@RptDate))), 1))
+when @RptDate &gt;= dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1))
+then dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1)) end
+                  AND pss.MonthEnd = 1) strtdts
+            CROSS JOIN (SELECT MAX(Extract_Date) as EndDate
+                        FROM dbo.ProjectStatisticsSnapshot pss
+                        WHERE pss.Extract_Date &lt;= case when @RptDate &lt;= dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1)) 
+then dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,Dateadd(month,-1,@RptDate)),Dateadd(month,-1,@RptDate))), 1))
+when @RptDate &gt;= dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1))
+then dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,@RptDate),@RptDate)), 1)) end AND pss.MonthEnd = 1
+                       ) psscur
+
+
+SELECT 'Bookings' AS DataSection
+     , pss.Prj_Key
+     , pss.Prj_Idno
+     , pss.Prj_Name
+     , pss.Prj_InvoiceType
+     , pss.Cli_Name
+     , ms.MS_Key 
+     , ms.MS_ID
+     , ms.MS_Name
+     , pss.PM_Initials
+     , pss.PM_Name
+     , pss.PIC_Initials
+     , MSL.Emp_Initials AS MSL_Initials
+     , dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+     , pss.ContractAmtFinal
+     , pss.ContractAmtMTDOrig
+     , pss.ContractAmtYTDOrig
+     , pss.MTDBookings
+     , pss.YTDBookings
+     , pss.MTDBillings
+     , pss.YTDBillings
+--     , AVG(mst.TargetAmt) AS TargetAmt
+     , MAX(mst.TargetAmt) OVER (PARTITION BY ms.ms_key) AS TargetAmt -- could switch out AVG for MAX/MIN/FIRST_VALUE, etc
+     , NULL AS BdgLaborAmt
+     , NULL AS LaborAmt
+     , NULL AS ProjectedLaborSalesAmt
+     , NULL AS ProjectedLaborSalesAmtForSummation
+     , NULL AS Phs_Name
+     , NULL AS Exp_PayeeName
+     , NULL AS Exp_LineNotes
+     , NULL AS ODCAmt
+     , NULL AS BdgODCAmt
+     , NULL AS BdgODCForSummation
+     , NULL AS BudgetExpensesForSummation
+	 ,NULL  ODCAmt1
+       , Null BdgODCAmt1
+       , Null BdgODCForSummation1
+     , @EndDate1 AS ReportingEndDate
+FROM dbo.MarketSegment ms
+LEFT JOIN (SELECT CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END AS tgt_Key, MS_Key, SUM(TargetAmt) AS TargetAmt
+      FROM dbo.MarketSegmentTargets
+      WHERE @MonthStartDate1 BETWEEN StartRange_Dt AND EndRange_Dt
+      AND TgtDescription = 'Bookings'
+      GROUP BY CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END, MS_Key) mst
+ON ms.MS_Key = mst.MS_Key 
+LEFT JOIN dbo.Employee MSL
+ON ms.Emp_Key = MSL.Emp_Key
+LEFT JOIN (SELECT prj.Prj_Key
+               , prj.Prj_Idno
+               , prj.Prj_Name
+               , prj.Prj_InvoiceType
+               , cli.Cli_Name
+                        , ms.ms_key
+                        , PM.Emp_key AS PM_Key
+                        , PM.Emp_Initials AS PM_Initials
+               , dbo.Emp_Name_By_Key(PM.Emp_Key) AS PM_Name
+               , PIC.Emp_Initials AS PIC_Initials
+                        , SUM(CASE WHEN pss.Extract_Date = @EndDate1 THEN pss.Contractamt ELSE 0 END) AS ContractAmtFinal
+               , SUM(CASE WHEN pss.Extract_Date = @MonthStartDate THEN pss.Contractamt ELSE 0 END) AS ContractAmtMTDOrig
+               , SUM(CASE WHEN pss.Extract_Date = @YearStartDate THEN pss.Contractamt ELSE 0 END) AS ContractAmtYTDOrig
+               , SUM(CASE WHEN pss.Extract_Date = @EndDate1 THEN pss.Contractamt ELSE 0 END) - SUM(CASE WHEN pss.Extract_Date = @MonthStartDate THEN pss.Contractamt ELSE 0 END) AS MTDBookings
+               , SUM(CASE WHEN pss.Extract_Date = @EndDate1 THEN pss.Contractamt ELSE 0 END) - SUM(CASE WHEN pss.Extract_Date = @YearStartDate THEN pss.Contractamt ELSE 0 END) AS YTDBookings
+               , SUM(CASE WHEN pss.Extract_Date = @EndDate1 THEN pss.InvoicedAmt ELSE 0 END) - SUM(CASE WHEN pss.Extract_Date = @MonthStartDate THEN pss.InvoicedAmt ELSE 0 END) AS MTDBillings
+               , SUM(CASE WHEN pss.Extract_Date = @EndDate1 THEN pss.InvoicedAmt ELSE 0 END) - SUM(CASE WHEN pss.Extract_Date = @YearStartDate THEN pss.InvoicedAmt ELSE 0 END) AS YTDBillings
+           FROM dbo.ProjectStatisticsSnapshot pss
+           JOIN dbo.Project prj
+                 ON pss.Prj_Key = prj.Prj_Key
+           JOIN dbo.Client cli
+                 ON prj.Cli_Key = cli.Cli_Key
+                 JOIN dbo.MarketSegment ms
+                 ON cli.MS_Key = ms.MS_Key
+                 OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+                 LEFT JOIN dbo.Employee PM
+                ON prj.PM_Key = PM.Emp_Key
+                LEFT JOIN dbo.Employee PIC
+                 ON prj.PIC_Key = PIC.Emp_Key
+                 WHERE pss.Extract_Date IN ( @YearStartDate1
+                           ,@MonthStartDate1
+                           ,@EndDate1)
+          AND prj.Prj_Type = N'D'
+                AND (
+                        (@ReportType = 1 AND pm.emp_Key IN (@FilterList)) -- by PM
+               OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+                    )
+                GROUP BY prj.Prj_Key
+               , prj.Prj_Idno
+               , prj.Prj_Name
+               , prj.Prj_InvoiceType
+               , cli.Cli_Name
+                        , ms.ms_key
+                        , PM.Emp_key 
+                        , PM.Emp_Initials 
+               , dbo.Emp_Name_By_Key(PM.Emp_Key) 
+               , PIC.Emp_Initials
+                HAVING SUM(CASE WHEN pss.Extract_Date = @EndDate1 THEN pss.Contractamt ELSE 0 END) - SUM(CASE WHEN pss.Extract_Date = @YearStartDate1 THEN pss.Contractamt ELSE 0 END) &lt;&gt; 0) pss
+ON ms.ms_key = pss.ms_key
+WHERE 1 = 1
+AND  (
+       (@ReportType = 1 AND pss.PM_Key IN (@FilterList)) -- by PM
+    OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+
+      )
+
+UNION ALL
+SELECT 'LaborSales' AS DataSection
+     , laborsales.Prj_Key
+     , laborsales.Prj_Idno
+     , laborsales.Prj_Name
+     , laborsales.Prj_InvoiceType
+     , laborsales.Cli_Name
+     , ms.MS_Key
+     , ms.MS_ID
+     , ms.MS_Name
+     , laborsales.PM_Initials
+     , laborsales.PM_Name
+     , laborsales.PIC_Initials
+     , MSL.Emp_Initials AS MSL_Initials
+     , dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+     , NULL AS ContractAmtFinal
+     , NULL AS ContractAmtMTDOrig
+     , NULL AS ContractAmtYTDOrig
+     , 0 AS MTDBookings
+     , 0 AS YTDBookings
+     , 0 AS MTDBillings
+     , 0 AS YTDBillings
+     , NULL AS TargetAmt
+     , laborsales.BdgLaborAmt
+     , laborsales.LaborAmt
+     , mst.TargetAmt AS ProjectedLaborSalesAmt
+     , (mst.TargetAmt)*1.0 / COUNT(1) OVER (PARTITION BY ms.MS_Key) ProjectedLaborSalesAmtForSummation
+     , NULL AS Phs_Name
+     , NULL AS Exp_PayeeName
+     , NULL AS Exp_LineNotes
+     , NULL AS ODCAmt
+     , NULL AS BdgODCAmt
+     , NULL AS BdgODCForSummation
+     , NULL AS BudgetExpensesForSummation
+	 ,NULL  ODCAmt1
+       , Null BdgODCAmt1
+       , Null BdgODCForSummation1
+     , laborsales.Extract_Date AS ReportingEndDate
+FROM dbo.MarketSegment ms
+LEFT JOIN (SELECT CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END AS tgt_Key, MS_Key, SUM(TargetAmt) AS TargetAmt
+      FROM dbo.MarketSegmentTargets
+      WHERE @MonthStartDate BETWEEN StartRange_Dt AND EndRange_Dt
+      AND TgtDescription = 'BudgetSalesLabor'
+      GROUP BY CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END, MS_Key) mst
+ON ms.MS_Key = mst.MS_Key 
+LEFT JOIN dbo.Employee MSL
+ON ms.Emp_Key = MSL.Emp_Key
+LEFT JOIN (SELECT prj.Prj_Key
+                , prj.Prj_idno
+                , prj.Prj_Name
+                , prj.Prj_InvoiceType
+                , cli.Cli_Name
+                , ms.MS_Key
+                , PM.Emp_Initials AS PM_Initials
+                , dbo.Emp_Name_By_Key(PM.Emp_Key) AS PM_Name
+                , PIC.Emp_Initials AS PIC_Initials
+                , prj.Prj_BdgAmtFees as BdgLaborAmt
+               , tim.LaborAmt
+                , @EndDate AS Extract_Date
+                 FROM dbo.Project prj
+                 JOIN (SELECT tim.prj_key
+				, ISNULL(SUM(tim.Tim_WrkHrs * tim.Tim_DilRate),0) AS LaborAmt
+                       FROM dbo.Time tim
+                       JOIN dbo.Project filt
+                       ON tim.Prj_Key = filt.prj_key
+                       WHERE Tim_IsCurrent = 1
+                       AND tim. Tim_WrkDate &gt;= @YearStartDate
+					   And tim. Tim_WrkDate &lt;= @EndDate
+                       AND filt.Prj_idno LIKE 'P-%'
+                       GROUP BY tim.Prj_Key) tim
+                 ON prj.Prj_Key = tim.Prj_Key
+            JOIN dbo.Client cli
+                 ON prj.Cli_Key = cli.Cli_Key
+                 JOIN dbo.MarketSegment ms
+                 ON cli.MS_Key = ms.MS_Key
+                 OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+                 LEFT JOIN dbo.Employee PM
+                ON prj.PM_Key = PM.Emp_Key
+                LEFT JOIN dbo.Employee PIC
+                 ON prj.PIC_Key = PIC.Emp_Key
+                 
+                 ) laborsales
+ON ms.ms_key = laborsales.ms_key
+WHERE 1 = 1
+AND  (
+       (@ReportType = 1 AND mst.tgt_Key IN (@FilterList)) -- by PM
+    OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+
+      ) 
+UNION ALL
+SELECT 'LaborMarketing' AS DataSection
+     , laborsales.Prj_Key
+     , laborsales.Prj_Idno
+     , laborsales.Prj_Name
+     , laborsales.Prj_InvoiceType
+     , laborsales.Cli_Name
+     , ms.MS_Key
+     , ms.MS_ID
+     , ms.MS_Name
+     , laborsales.PM_Initials
+     , laborsales.PM_Name
+     , laborsales.PIC_Initials
+     , MSL.Emp_Initials AS MSL_Initials
+     , dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+     , NULL AS ContractAmtFinal
+     , NULL AS ContractAmtMTDOrig
+     , NULL AS ContractAmtYTDOrig
+     , 0 AS MTDBookings
+     , 0 AS YTDBookings
+     , 0 AS MTDBillings
+     , 0 AS YTDBillings
+     , NULL AS TargetAmt
+     , laborsales.BdgLaborAmt
+     , laborsales.LaborAmt
+     , mst.TargetAmt AS ProjectedLaborSalesAmt
+     , (mst.TargetAmt)*1.0 / COUNT(1) OVER (PARTITION BY ms.MS_Key) ProjectedLaborSalesAmtForSummation
+     , NULL AS Phs_Name
+     , NULL AS Exp_PayeeName
+     , NULL AS Exp_LineNotes
+     , NULL AS ODCAmt
+     , NULL AS BdgODCAmt
+     , NULL AS BdgODCForSummation
+     , NULL AS BudgetExpensesForSummation
+	 ,NULL  ODCAmt1
+       , Null BdgODCAmt1
+       , Null BdgODCForSummation1
+     , laborsales.EndDate AS ReportingEndDate
+FROM dbo.MarketSegment ms
+LEFT JOIN (SELECT CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END AS tgt_Key, MS_Key, SUM(TargetAmt) AS TargetAmt
+      FROM dbo.MarketSegmentTargets
+      WHERE @MonthStartDate BETWEEN StartRange_Dt AND EndRange_Dt
+      AND TgtDescription = 'BudgetLaborMkt'
+      GROUP BY CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END, MS_Key) mst
+ON ms.MS_Key = mst.MS_Key 
+LEFT JOIN dbo.Employee MSL
+ON ms.Emp_Key = MSL.Emp_Key
+LEFT JOIN (SELECT prj.Prj_Key
+                , prj.Prj_Idno
+                , prj.Prj_Name
+                , prj.Prj_InvoiceType
+                , cli.Cli_Name
+                , ms.MS_Key
+                , PM.Emp_Initials AS PM_Initials
+                , dbo.Emp_Name_By_Key(PM.Emp_Key) AS PM_Name
+                , PIC.Emp_Initials AS PIC_Initials
+                           , prj.Prj_BdgAmtFees as BdgLaborAmt
+                , LaborAmt
+                           , @EndDate EndDate
+           FROM dbo.Project prj
+                 Left Outer JOIN (SELECT tim.prj_key
+				, ISNULL(SUM(tim.Tim_WrkHrs * tim.Tim_DilRate),0) AS LaborAmt
+                       FROM dbo.Time tim
+                       JOIN dbo.Project filt
+                       ON tim.Prj_Key = filt.prj_key
+					   Join MarketSegment ms
+					   on filt.MS_Key = ms.MS_Key
+                       WHERE Tim_IsCurrent = 1
+                       AND tim. Tim_WrkDate &gt;= @YearStartDate
+					   And tim. Tim_WrkDate &lt;= @EndDate
+                       AND filt.Prj_Idno = 'BD-' + CAST(YEAR(@YearStartDate) AS VARCHAR) + '-' + ms.MS_ID
+                       GROUP BY tim.Prj_Key) tim
+                 ON prj.Prj_Key = tim.Prj_Key
+           JOIN dbo.Client cli
+                 ON prj.Cli_Key = cli.Cli_Key
+                 JOIN dbo.MarketSegment ms
+                 ON cli.MS_Key = ms.MS_Key
+                 OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+                 LEFT JOIN dbo.Employee PM
+                ON prj.PM_Key = PM.Emp_Key
+                LEFT JOIN dbo.Employee PIC
+                 ON prj.PIC_Key = PIC.Emp_Key
+                 WHERE (
+                    (@ReportType = 1 AND pm.emp_key IN (@FilterList)) -- by PM
+                 OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+                )
+                AND (    (prj.Prj_Idno = 'BD-' + CAST(YEAR(@YearStartDate) AS VARCHAR) + '-' + ms.MS_ID)
+                 --OR (prj.Prj_Idno LIKE 'I-%-' + ms.MS_ID + '-%' AND pss.Prj_Status = 'A') Taken Out for New Scorecard
+               ) 
+                 ) laborsales
+ON ms.ms_key = laborsales.ms_key
+WHERE 1 = 1
+AND  (
+       (@ReportType = 1 AND mst.tgt_Key IN (@FilterList)) -- by PM
+    OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+
+      ) 
+
+UNION ALL
+SELECT 'LaborNetworking' AS DataSection
+     , laborsales.Prj_Key
+     , laborsales.Prj_Idno
+     , laborsales.Prj_Name
+     , laborsales.Prj_InvoiceType
+     , laborsales.Cli_Name
+     , ms.MS_Key
+     , ms.MS_ID
+     , ms.MS_Name
+     , laborsales.PM_Initials
+     , laborsales.PM_Name
+     , laborsales.PIC_Initials
+     , MSL.Emp_Initials AS MSL_Initials
+     , dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+     , NULL AS ContractAmtFinal
+     , NULL AS ContractAmtMTDOrig
+     , NULL AS ContractAmtYTDOrig
+     , 0 AS MTDBookings
+     , 0 AS YTDBookings
+     , 0 AS MTDBillings
+     , 0 AS YTDBillings
+     , NULL AS TargetAmt
+     , laborsales.BdgLaborAmt
+     , laborsales.LaborAmt
+     , mst.TargetAmt AS ProjectedLaborSalesAmt
+     , (mst.TargetAmt)*1.0 / COUNT(1) OVER (PARTITION BY ms.MS_Key) ProjectedLaborSalesAmtForSummation
+     , NULL AS Phs_Name
+     , NULL AS Exp_PayeeName
+     , NULL AS Exp_LineNotes
+     , NULL AS ODCAmt
+     , NULL AS BdgODCAmt
+     , NULL AS BdgODCForSummation
+     , NULL AS BudgetExpensesForSummation
+	 ,NULL  ODCAmt1
+       , Null BdgODCAmt1
+       , Null BdgODCForSummation1
+     , laborsales.EndDate AS ReportingEndDate
+
+FROM dbo.MarketSegment ms
+LEFT JOIN (SELECT CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END AS tgt_Key, MS_Key, SUM(TargetAmt) AS TargetAmt
+      FROM dbo.MarketSegmentTargets
+      WHERE @MonthStartDate BETWEEN StartRange_Dt AND EndRange_Dt
+      AND TgtDescription = 'BudgetLaborNet'
+      GROUP BY CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END, MS_Key) mst
+ON ms.MS_Key = mst.MS_Key 
+LEFT JOIN dbo.Employee MSL
+ON ms.Emp_Key = MSL.Emp_Key
+LEFT JOIN (SELECT prj.Prj_Key
+                , prj.Prj_Idno
+                , prj.Prj_Name
+                , prj.Prj_InvoiceType
+                , cli.Cli_Name
+                , ms.MS_Key
+                , PM.Emp_Initials AS PM_Initials
+                , dbo.Emp_Name_By_Key(PM.Emp_Key) AS PM_Name
+                , PIC.Emp_Initials AS PIC_Initials
+                           , prj.Prj_BdgAmtFees as BdgLaborAmt
+                , ISNULL(Sum(LaborAmt),0) LaborAmt
+				
+                           , @EndDate EndDate
+           FROM dbo.Project prj
+                 Left Outer JOIN (SELECT tim.prj_key,tim.Tim_WrkDate
+				, ISNULL(sum(tim.Tim_WrkHrs * tim.Tim_DilRate),0) AS LaborAmt
+                      FROM dbo.Time tim
+                       JOIN dbo.Project filt
+                       ON tim.Prj_Key = filt.prj_key
+					   Join MarketSegment ms
+					   on filt.MS_Key = ms.MS_Key
+                       WHERE Tim_IsCurrent = 1
+                       AND tim. Tim_WrkDate &gt;= @YearStartDate
+					   And tim. Tim_WrkDate &lt;= @EndDate
+                       AND filt.Prj_Idno LIKE 'I-%' + ms.MS_ID + '-%' 
+					   --AND filt.Prj_Status = 'A'
+                       GROUP BY tim.Prj_Key,tim.Tim_WrkDate) tim
+                 ON prj.Prj_Key = tim.Prj_Key
+           JOIN dbo.Client cli
+                 ON prj.Cli_Key = cli.Cli_Key
+                 JOIN dbo.MarketSegment ms
+                 ON cli.MS_Key = ms.MS_Key
+                 OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+                 LEFT JOIN dbo.Employee PM
+                ON prj.PM_Key = PM.Emp_Key
+                LEFT JOIN dbo.Employee PIC
+                 ON prj.PIC_Key = PIC.Emp_Key
+                 WHERE (prj.Prj_Idno LIKE 'I-%' + ms.MS_ID + '-%' and tim.Tim_WrkDate IS NOT NULL
+				 OR prj.Prj_Idno LIKE 'I-' + RIGHT(CAST(YEAR(@YearStartDate) AS VARCHAR),2) + '-' + ms.MS_ID + '-%' AND prj.Prj_Status = 'A') AND (
+                    (@ReportType = 1 AND pm.emp_key IN (@FilterList)) -- by PM
+                 OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+                )
+                
+			   Group By prj.Prj_Key
+                , prj.Prj_Idno
+                , prj.Prj_Name
+                , prj.Prj_InvoiceType
+                , cli.Cli_Name
+                , ms.MS_Key
+                , PM.Emp_Initials
+                , dbo.Emp_Name_By_Key(PM.Emp_Key)
+                , PIC.Emp_Initials
+                           , prj.Prj_BdgAmtFees 
+                 ) laborsales
+ON ms.ms_key = laborsales.ms_key
+WHERE 1 = 1
+AND  (
+       (@ReportType = 1 AND mst.tgt_Key IN (@FilterList)) -- by PM
+    OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+
+      ) 
+UNION ALL
+SELECT 'ExpensesMarketing' AS DataSection
+       , expmkt.Prj_Key
+       , expmkt.Prj_idno
+       , expmkt.Prj_Name
+       , expmkt.Prj_InvoiceType
+       , expmkt.Cli_Name
+       , ms.MS_Key
+       , ms.MS_ID
+       , ms.MS_Name
+       , expmkt.PM_Initials
+       , expmkt.PM_Name
+       , expmkt.PIC_Initials
+       , MSL.Emp_Initials AS MSL_Initials
+       , dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+       , NULL AS ContractAmtFinal
+       , NULL AS ContractAmtMTDOrig
+       , NULL AS ContractAmtYTDOrig
+       , 0 AS MTDBookings
+       , 0 AS YTDBookings
+       , 0 AS MTDBillings
+       , 0 AS YTDBillings
+       , NULL AS TargetAmt
+       , NULl AS BdgLaborAmt
+       , NULL AS LaborAmt
+       , NULL AS ProjectedLaborSalesAmt
+       , NULL AS ProjectedLaborSalesAmtForSummation
+       , expmkt.Phs_Name
+       , expmkt.Exp_PayeeName
+       , expmkt.Exp_LineNotes
+       , expmkt.ODCAmt
+       , expmkt.BdgODCAmt
+       , expmkt.BdgODCForSummation
+       , (mst.TargetAmt)*1.0 / COUNT(1) OVER (PARTITION BY ms.MS_Key) AS BudgetLaborMarketingForSummation
+	   ,NULL  ODCAmt1
+       , Null BdgODCAmt1
+       , Null BdgODCForSummation1
+       , @EndDate
+FROM dbo.MarketSegment ms
+LEFT JOIN (SELECT CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END AS tgt_Key, MS_Key, SUM(TargetAmt) AS TargetAmt
+      FROM dbo.MarketSegmentTargets
+      WHERE DATEADD(MONTH, DATEDIFF(MONTH, 0, @RptDate)-1, 0) BETWEEN StartRange_Dt AND EndRange_Dt
+      AND TgtDescription = 'BudgetExpensesMarketing'
+      GROUP BY CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END, MS_Key) mst
+ON ms.MS_Key = mst.MS_Key 
+LEFT JOIN dbo.Employee MSL
+ON ms.Emp_Key = MSL.Emp_Key
+LEFT JOIN (SELECT prj.Prj_Key
+                , prj.Prj_Idno
+                , prj.Prj_Name
+                , prj.Prj_InvoiceType
+                , cli.Cli_Name
+                , ms.MS_Key
+                , PM.Emp_Initials AS PM_Initials
+                , dbo.Emp_Name_By_Key(PM.Emp_Key) AS PM_Name
+                , PIC.Emp_Initials AS PIC_Initials
+                , phs.Phs_Name
+                , cst.Exp_PayeeName
+                , cst.Exp_LineNotes
+                , ISNULL(cst.Exp_CstPerUnit * cst.Exp_NumberOfUnits,0) as ODCAmt
+                , (ISNULL(Phs_BdgConsCst, 0) + ISNULL(Phs_BdgReim, 0) + ISNULL(Phs_BdgNonReimCst, 0)) AS BdgODCAmt
+                , (ISNULL(Phs_BdgConsCst, 0) + ISNULL(Phs_BdgReim, 0) + ISNULL(Phs_BdgNonReimCst, 0)) / COUNT(1) OVER (PARTITION BY ms.MS_Key, phs.Phs_Key) BdgODCForSummation
+           FROM dbo.Project prj
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.MarketSegment ms
+ON cli.MS_Key = ms.MS_Key
+OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+JOIN dbo.Employee PM
+ON prj.PM_Key = PM.Emp_Key
+JOIN dbo.Employee PIC
+ON prj.PIC_Key = PIC.Emp_Key
+JOIN dbo.Employee MSL
+ON ms.Emp_Key = MSL.Emp_Key
+JOIN dbo.Phase phs
+ON phs.Prj_Key = prj.prj_Key
+LEFT JOIN dbo.Expense cst
+ON prj.Prj_Key = cst.Prj_Key
+AND cst.Exp_IsCurrent = 1
+AND phs.Phs_Key = cst.Phs_Key
+AND cst.Exp_Date BETWEEN @YearStartDate AND @EndDate
+WHERE 1 = 1
+AND  (
+       (@ReportType = 1 AND pm.emp_key IN (@FilterList)) -- by PM
+    OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+      )
+AND (prj.Prj_idno = 'BD-' + CAST(YEAR(@YearStartDate) AS VARCHAR) +'-' + ms.MS_ID
+--OR (prj.Prj_idno LIKE 'I-%-' + ms.MS_ID + '-%' AND prj.Prj_Status = 'A')
+
+)
+) expmkt
+ON ms.ms_key = expmkt.ms_key
+WHERE 1 = 1
+AND  (
+       (@ReportType = 1 AND mst.tgt_Key IN (@FilterList)) -- by PM
+    OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+
+      ) 
+
+UNION ALL
+
+SELECT 'ExpensesNetworking' AS DataSection
+       , expmkt.Prj_Key
+       , expmkt.Prj_idno
+       , expmkt.Prj_Name
+       , expmkt.Prj_InvoiceType
+       , expmkt.Cli_Name
+       , ms.MS_Key
+       , ms.MS_ID
+       , ms.MS_Name
+       , expmkt.PM_Initials
+       , expmkt.PM_Name
+       , expmkt.PIC_Initials
+       , MSL.Emp_Initials AS MSL_Initials
+       , dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+       , NULL AS ContractAmtFinal
+       , NULL AS ContractAmtMTDOrig
+       , NULL AS ContractAmtYTDOrig
+       , 0 AS MTDBookings
+       , 0 AS YTDBookings
+       , 0 AS MTDBillings
+       , 0 AS YTDBillings
+       , NULL AS TargetAmt
+       , NULl AS BdgLaborAmt
+       , NULL AS LaborAmt
+       , NULL AS ProjectedLaborSalesAmt
+       , NULL AS ProjectedLaborSalesAmtForSummation
+       , expmkt.Phs_Name
+       , expmkt.Exp_PayeeName
+       , expmkt.Exp_LineNotes
+       , expmkt.ODCAmt
+       , expmkt.BdgODCAmt
+       , expmkt.BdgODCForSummation
+       , (mst.TargetAmt)*1.0 / COUNT(1) OVER (PARTITION BY ms.MS_Key) AS BudgetLaborMarketingForSummation
+	   ,NULL  ODCAmt1
+       , Null BdgODCAmt1
+       , Null BdgODCForSummation1
+       , @EndDate
+FROM dbo.MarketSegment ms
+LEFT JOIN (SELECT CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END AS tgt_Key, MS_Key, SUM(TargetAmt) AS TargetAmt
+      FROM dbo.MarketSegmentTargets
+      WHERE @MonthStartDate BETWEEN StartRange_Dt AND EndRange_Dt
+      AND TgtDescription = 'BudgetExpensesMarketing'
+      GROUP BY CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END, MS_Key) mst
+ON ms.MS_Key = mst.MS_Key 
+LEFT JOIN dbo.Employee MSL
+ON ms.Emp_Key = MSL.Emp_Key
+LEFT JOIN (SELECT prj.Prj_Key
+                , prj.Prj_Idno
+                , prj.Prj_Name
+                , prj.Prj_InvoiceType
+                , cli.Cli_Name
+                , ms.MS_Key
+                , PM.Emp_Initials AS PM_Initials
+                , dbo.Emp_Name_By_Key(PM.Emp_Key) AS PM_Name
+                , PIC.Emp_Initials AS PIC_Initials
+                , phs.Phs_Name
+                , cst.Exp_PayeeName
+                , cst.Exp_LineNotes
+                , ISNULL(cst.Exp_CstPerUnit * cst.Exp_NumberOfUnits,0) as ODCAmt
+                , (ISNULL(Phs_BdgConsCst, 0) + ISNULL(Phs_BdgReim, 0) + ISNULL(Phs_BdgNonReimCst, 0)) AS BdgODCAmt
+                , (ISNULL(Phs_BdgConsCst, 0) + ISNULL(Phs_BdgReim, 0) + ISNULL(Phs_BdgNonReimCst, 0)) / COUNT(1) OVER (PARTITION BY ms.MS_Key, phs.Phs_Key) BdgODCForSummation
+				,cst.Exp_Date
+           FROM dbo.Project prj
+JOIN dbo.Client cli
+ON prj.Cli_Key = cli.Cli_Key
+JOIN dbo.MarketSegment ms
+ON cli.MS_Key = ms.MS_Key
+OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+JOIN dbo.Employee PM
+ON prj.PM_Key = PM.Emp_Key
+JOIN dbo.Employee PIC
+ON prj.PIC_Key = PIC.Emp_Key
+JOIN dbo.Employee MSL
+ON ms.Emp_Key = MSL.Emp_Key
+JOIN dbo.Phase phs
+ON phs.Prj_Key = prj.prj_Key
+LEFT JOIN dbo.Expense cst
+ON prj.Prj_Key = cst.Prj_Key
+AND cst.Exp_IsCurrent = 1
+AND phs.Phs_Key = cst.Phs_Key
+AND cst.Exp_Date BETWEEN DateAdd(YY,0,@YearStartDate) AND @EndDate
+WHERE 1 = 1 
+AND (prj.Prj_Idno LIKE 'I-%' + ms.MS_ID + '-%' AND Exp_Date IS NOT NULL
+OR prj.Prj_Idno LIKE 'I-' + RIGHT(CAST(YEAR(@YearStartDate) AS VARCHAR),2) + '-' + ms.MS_ID + '-%' AND prj.Prj_Status = 'A')
+AND  (
+       (@ReportType = 1 AND pm.emp_key IN (@FilterList)) -- by PM
+    OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+      )
+) expmkt
+ON ms.ms_key = expmkt.ms_key
+WHERE 1 = 1
+AND  (
+       (@ReportType = 1 AND mst.tgt_Key IN (@FilterList)) -- by PM
+    OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+
+      ) 
+UNiON ALL
+SELECT 'ExpensesSales' AS DataSection
+       , expsales.Prj_Key
+       , expsales.Prj_idno
+       , expsales.Prj_Name
+       , expsales.Prj_InvoiceType
+       , expsales.Cli_Name
+       , ms.MS_Key
+       , ms.MS_ID
+       , ms.MS_Name
+       , expsales.PM_Initials
+       , expsales.PM_Name
+       , expsales.PIC_Initials
+       , MSL.Emp_Initials AS MSL_Initials
+       , dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+       , NULL AS ContractAmtFinal
+       , NULL AS ContractAmtMTDOrig
+       , NULL AS ContractAmtYTDOrig
+       , 0 AS MTDBookings
+       , 0 AS YTDBookings
+       , 0 AS MTDBillings
+       , 0 AS YTDBillings
+       , NULL AS TargetAmt
+       , NULl AS BdgLaborAmt
+       , NULL AS LaborAmt
+       , NULL AS ProjectedLaborSalesAmt
+       , NULL AS ProjectedLaborSalesAmtForSummation
+       , expsales.Phs_Name
+       , expsales.Exp_PayeeName
+       , expsales.Exp_LineNotes
+	   ,expsales.ODCAmt
+	   ,expsales.BdgODCAmt
+	   ,expsales.BdgODCForSummation
+       , (mst.TargetAmt)*1.0 / (COUNT(1) OVER (PARTITION BY ms.MS_Key)) AS BudgetExpensesForSummation
+	   , ISNULL(expsales.Exp_CstPerUnit * expsales.Exp_NumberOfUnits,0) as ODCAmt1
+       , mst.TargetAmt AS BdgODCAmt1
+       , (mst.TargetAmt)*1.0 / (COUNT(1) OVER (PARTITION BY ms.MS_Key)) BdgODCForSummation1
+       , @EndDate
+FROM dbo.MarketSegment ms
+LEFT JOIN (SELECT CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END AS tgt_Key, MS_Key, SUM(TargetAmt) AS TargetAmt
+      FROM dbo.MarketSegmentTargets
+      WHERE @MonthStartDate BETWEEN StartRange_Dt AND EndRange_Dt
+      AND TgtDescription = 'BudgetExpensesSales'
+      GROUP BY CASE WHEN @ReportType = 1 THEN PM_Key
+                  WHEN @ReportType = 4 THEN MS_Key
+             ELSE MS_Key END, MS_Key) mst
+ON ms.MS_Key = mst.MS_Key 
+LEFT JOIN dbo.Employee MSL
+ON ms.Emp_Key = MSL.Emp_Key
+LEFT JOIN (SELECT prj.Prj_Key
+                         , prj.Prj_idno
+                         , prj.Prj_Name
+                         , prj.Prj_InvoiceType
+                         , cli.Cli_Name
+                         , ms.MS_Key
+                         , PM.Emp_Initials AS PM_Initials
+                           , dbo.Emp_Name_By_Key(PM.Emp_Key) AS PM_Name
+                , PIC.Emp_Initials AS PIC_Initials
+                , MSL.Emp_Initials AS MSL_Initials
+                , dbo.Emp_Name_By_Key(ms.Emp_Key) AS MSL_Name
+                           , phs.Phs_Name
+                , cst.Exp_PayeeName
+                , cst.Exp_LineNotes
+                   , cst.Exp_CstPerUnit
+                   , Exp_NumberOfUnits
+				   , ISNULL(cst.Exp_CstPerUnit * cst.Exp_NumberOfUnits,0) as ODCAmt
+                , (ISNULL(Phs_BdgConsCst, 0) + ISNULL(Phs_BdgReim, 0) + ISNULL(Phs_BdgNonReimCst, 0)) AS BdgODCAmt
+                , (ISNULL(Phs_BdgConsCst, 0) + ISNULL(Phs_BdgReim, 0) + ISNULL(Phs_BdgNonReimCst, 0)) / COUNT(1) OVER (PARTITION BY ms.MS_Key, phs.Phs_Key) BdgODCForSummation
+           FROM dbo.Project prj
+           JOIN dbo.Client cli
+                 ON prj.Cli_Key = cli.Cli_Key
+                 JOIN dbo.MarketSegment ms
+                 ON cli.MS_Key = ms.MS_Key
+                 OR cli.MS_Key = -1 AND prj.MS_Key = ms.MS_Key
+                 JOIN dbo.Employee PM
+                 ON prj.PM_Key = PM.Emp_Key
+                 JOIN dbo.Employee PIC
+                 ON prj.PIC_Key = PIC.Emp_Key
+                 JOIN dbo.Employee MSL
+                 ON ms.Emp_Key = MSL.Emp_Key
+                 JOIN dbo.Phase phs
+                 ON phs.Prj_Key = prj.prj_Key
+                 JOIN dbo.Expense cst
+                 ON prj.Prj_Key = cst.Prj_Key
+                 AND cst.Exp_IsCurrent = 1
+                 AND phs.Phs_Key = cst.Phs_Key
+                 AND cst.Exp_Date BETWEEN @YearStartDate AND @EndDate
+           --WHERE (prj.Prj_idno LIKE 'P-%')
+         WHERE (prj.Prj_idno LIKE 'P-%')
+                 AND  (
+                               (@ReportType = 1 AND pm.emp_key IN (@FilterList)) -- by PM
+                           OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+                           )) expsales
+ON ms.ms_key = expsales.MS_Key
+WHERE 1 = 1
+AND  (
+       (@ReportType = 1 AND mst.tgt_Key IN (@FilterList)) -- by PM
+    OR (@ReportType = 4 AND ms.MS_Key IN (@FilterList)) -- by MktSeg
+
+      )</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="DataSection">
+        <DataField>DataSection</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Key">
+        <DataField>Prj_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Idno">
+        <DataField>Prj_Idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Name">
+        <DataField>Prj_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_InvoiceType">
+        <DataField>Prj_InvoiceType</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cli_Name">
+        <DataField>Cli_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MS_Key">
+        <DataField>MS_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="MS_ID">
+        <DataField>MS_ID</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MS_Name">
+        <DataField>MS_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_Initials">
+        <DataField>PM_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_Name">
+        <DataField>PM_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Initials">
+        <DataField>PIC_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MSL_Initials">
+        <DataField>MSL_Initials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="MSL_Name">
+        <DataField>MSL_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="ContractAmtFinal">
+        <DataField>ContractAmtFinal</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="ContractAmtMTDOrig">
+        <DataField>ContractAmtMTDOrig</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="ContractAmtYTDOrig">
+        <DataField>ContractAmtYTDOrig</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="MTDBookings">
+        <DataField>MTDBookings</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTDBookings">
+        <DataField>YTDBookings</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="MTDBillings">
+        <DataField>MTDBillings</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="YTDBillings">
+        <DataField>YTDBillings</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="TargetAmt">
+        <DataField>TargetAmt</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="BdgLaborAmt">
+        <DataField>BdgLaborAmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="LaborAmt">
+        <DataField>LaborAmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="ProjectedLaborSalesAmt">
+        <DataField>ProjectedLaborSalesAmt</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="ProjectedLaborSalesAmtForSummation">
+        <DataField>ProjectedLaborSalesAmtForSummation</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_Name">
+        <DataField>Phs_Name</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Exp_PayeeName">
+        <DataField>Exp_PayeeName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Exp_LineNotes">
+        <DataField>Exp_LineNotes</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="ODCAmt">
+        <DataField>ODCAmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="BdgODCAmt">
+        <DataField>BdgODCAmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="BdgODCForSummation">
+        <DataField>BdgODCForSummation</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="BudgetExpensesForSummation">
+        <DataField>BudgetExpensesForSummation</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="ODCAmt1">
+        <DataField>ODCAmt1</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="ReportingEndDate">
+        <DataField>ReportingEndDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="BdgODCAmt1">
+        <DataField>BdgODCAmt1</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="BdgODCForSummation1">
+        <DataField>BdgODCForSummation1</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="DataSectionMktNetSales">
+        <Value>=iif(Fields!DataSection.Value like "*Marketing","Mkt",iif(Fields!DataSection.Value like "*Networking","Net",iif(Fields!DataSection.Value like "*Sales","Sale","N/A")))</Value>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

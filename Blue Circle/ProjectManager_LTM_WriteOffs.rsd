@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@PM_Key">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>If GETDATE() &lt; dateadd(dd,-1,DATEADD(wk,DATEDIFF(wk,0,dateadd(dd,7-datepart(day,GETDATE()),GETDATE())), 1))
+SELECT CONVERT(DATE,DATEADD(m, DATEDIFF(m, 0, rpd.FullDate), 0)) AS FullDate
+     , SUM(ISNULL(wo.Wo_Amt,0)) AS WriteOffAmt
+FROM         ReportingDates rpd
+LEFT JOIN (dbo.vWriteoffs wo  
+--ON rpd.FullDate = wo.Wo_Date
+JOIN dbo.Project prj 
+ON prj.Prj_Key = wo.Prj_Key 
+JOIN dbo.Employee emp 
+ON emp.Emp_Key = prj.PM_Key
+AND emp.Emp_Key = @PM_Key)
+ON rpd.FullDate = wo.Wo_Date
+WHERE     (rpd.FullDate &gt; EOMONTH(DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1),-13) 
+AND rpd.fulldate &lt; EOMONTH(DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1),-1))  
+GROUP BY CONVERT(DATE,DATEADD(m, DATEDIFF(m, 0, rpd.FullDate), 0))
+Order by FullDate
+else
+SELECT CONVERT(DATE,DATEADD(m, DATEDIFF(m, 0, rpd.FullDate), 0)) AS FullDate
+     , SUM(ISNULL(wo.Wo_Amt,0)) AS WriteOffAmt
+FROM         ReportingDates rpd
+LEFT JOIN (dbo.vWriteoffs wo  
+--ON rpd.FullDate = wo.Wo_Date
+JOIN dbo.Project prj 
+ON prj.Prj_Key = wo.Prj_Key 
+JOIN dbo.Employee emp 
+ON emp.Emp_Key = prj.PM_Key
+AND emp.Emp_Key = @PM_Key)
+ON rpd.FullDate = wo.Wo_Date
+WHERE     (rpd.FullDate &gt; DATEADD(dd, 1, EOMonth(GETDATE(), - 13))
+AND rpd.fulldate &lt;= EOMonth(GETDATE(), - 1))  
+GROUP BY CONVERT(DATE,DATEADD(m, DATEDIFF(m, 0, rpd.FullDate), 0))
+Order by FullDate</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="FullDate">
+        <DataField>FullDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="WriteOffAmt">
+        <DataField>WriteOffAmt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

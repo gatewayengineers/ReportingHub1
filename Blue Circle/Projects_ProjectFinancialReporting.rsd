@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="Projects_ProjectFinancialReporting">
+    <Query>
+      <DataSourceReference>ODS_Reporting</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="@FilterList">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@FilterType">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="@LTMFlg">
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Object</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandType>StoredProcedure</CommandType>
+      <CommandText>PFR_GetByList</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Prj_idno">
+        <DataField>Prj_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PM_NAME">
+        <Value>=RTRIM(Fields!Emp_lastname.Value) &amp; ", " &amp; RTRIM(Fields!Emp_firstname.Value) &amp; " " &amp; RTRIM(Fields!Emp_middleinitial.Value) &amp; Iif(RTRIM(Fields!Emp_firstname.Value) = "Ian" , " ", ".")</Value>
+      </Field>
+      <Field Name="Prj_lngname">
+        <DataField>Prj_lngname</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_pmname">
+        <Value>=Fields!PM_NAME.Value</Value>
+      </Field>
+      <Field Name="PIC_NAME">
+        <Value>=RTRIM(Fields!Pic_lastname.Value) &amp; ", " &amp; RTRIM(Fields!Pic_firstname.Value) &amp; " " &amp; RTRIM(Fields!Pic_middleinitial.Value) &amp; Iif(RTRIM(Fields!Pic_firstname.Value) = "Ian" , " ", ".")</Value>
+      </Field>
+      <Field Name="Prj_picinitials">
+        <DataField>Prj_picinitials</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Idno_Prefix">
+        <Value>=Left(Fields!Prj_idno.Value,2)</Value>
+      </Field>
+      <Field Name="Prj_lstbildat">
+        <DataField>Prj_lstbildat</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Emp_firstname">
+        <DataField>Emp_firstname</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Idno_Grouping">
+        <Value>=Switch(Fields!Prj_Idno_Prefix.Value="P-",1,
+Fields!Prj_Idno_Prefix.Value="I-",1,
+Fields!Prj_Idno_Prefix.Value="BD",1,
+True,0)</Value>
+      </Field>
+      <Field Name="Emp_lastname">
+        <DataField>Emp_lastname</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Emp_middleinitial">
+        <DataField>Emp_middleinitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Pic_firstname">
+        <DataField>Pic_firstname</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Pic_lastname">
+        <DataField>Pic_lastname</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Pic_middleinitial">
+        <DataField>Pic_middleinitial</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Phs_lngname">
+        <DataField>Phs_lngname</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Phs_status">
+        <DataField>Phs_status</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Phs_todate">
+        <DataField>Phs_todate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Phs_feecstbdg">
+        <DataField>Phs_feecstbdg</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_feecst">
+        <DataField>Phs_feecst</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_wrkhrsbdg">
+        <DataField>Phs_wrkhrsbdg</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_wrkhrs">
+        <DataField>Phs_wrkhrs</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_wip">
+        <DataField>Phs_wip</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_totcontract">
+        <DataField>Phs_totcontract</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_totbill">
+        <DataField>Phs_totbill</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_totrcv">
+        <DataField>Phs_totrcv</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_totodcbdg">
+        <DataField>Phs_totodcbdg</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_totodc">
+        <DataField>Phs_totodc</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_labprcnt">
+        <DataField>Phs_labprcnt</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_totrev">
+        <DataField>Phs_totrev</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_nemact">
+        <DataField>Phs_nemact</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Phs_nembdg">
+        <DataField>Phs_nembdg</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="DW_loaddate">
+        <DataField>DW_loaddate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Phs_idno">
+        <DataField>Phs_idno</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Phs_WrkDate">
+        <DataField>Phs_WrkDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Status">
+        <DataField>Prj_Status</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="prj_totrev">
+        <DataField>prj_totrev</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Key">
+        <DataField>Prj_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PM_Key">
+        <DataField>PM_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PIC_Key">
+        <DataField>PIC_Key</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="Prj_Type">
+        <DataField>Prj_Type</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>
