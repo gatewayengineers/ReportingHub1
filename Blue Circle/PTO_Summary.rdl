@@ -110,6 +110,7 @@ SELECT emp.Emp_Key
      , tml.Emp_Initials as TML_Initials
      , ISNULL(util.YTD_PTO,0) AS YTD_PTO
      , ISNULL(bdg.Util_BdgPTO,0) AS Bdg_PTO
+	 , ISNULL(bdg.Util_BdgPTO_Adjust,0) AS Bdg_PTO_Adjust
 	 , convert(decimal(38,1),(ISNULL(bdg.Util_BdgPTO,0)/bdg.WeeksOfBudget) * datepart(wk,getdate())) Accrued_PTO
 	 , convert(decimal(38,1),(ISNULL(bdg.Util_BdgPTO,0)/bdg.WeeksOfBudget) * datepart(wk,getdate())) - ISNULL(util.YTD_PTO,0) Used_Accrued
 FROM 
@@ -132,6 +133,7 @@ FULL JOIN (SELECT ubdg.Emp_Key
            , ubdg.Util_BdgMkt
            , ubdg.Util_BdgProp
            , ubdg.Util_BdgPTO
+		   , ubdg.Util_BdgPTO_Adjust
            , ubdg.Util_BdgTrain
            , ubdg.Util_BdgStd
            , ubdg.Util_BdgTotal
@@ -225,6 +227,10 @@ AND emp.Emp_Status = 'Y'</CommandText>
         </Field>
         <Field Name="Bdg_PTO">
           <DataField>Bdg_PTO</DataField>
+          <rd:TypeName>System.Double</rd:TypeName>
+        </Field>
+        <Field Name="Bdg_PTO_Adjust">
+          <DataField>Bdg_PTO_Adjust</DataField>
           <rd:TypeName>System.Double</rd:TypeName>
         </Field>
         <Field Name="GroupingField">
@@ -843,7 +849,7 @@ Used</Value>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Bdg_PTO.Value</Value>
+                                                    <Value>=Fields!Bdg_PTO_Adjust.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <Format>N2</Format>
@@ -1007,7 +1013,7 @@ Used</Value>
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Bdg_PTO.Value-Fields!YTD_PTO.Value</Value>
+                                                    <Value>=Fields!Bdg_PTO_Adjust.Value-Fields!YTD_PTO.Value</Value>
                                                     <Style>
                                                       <FontSize>8pt</FontSize>
                                                       <FontWeight>Bold</FontWeight>
@@ -1173,7 +1179,6 @@ Used</Value>
                           <KeepTogether>true</KeepTogether>
                           <Style />
                         </Rectangle>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                   </TablixCells>

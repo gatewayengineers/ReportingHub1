@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <Description />
   <DataSet Name="ProfessionalResources_Utilization">
     <Query>
@@ -74,6 +74,7 @@ SELECT emp.Emp_Key
      , ISNULL(util.Cur_PTO,0) AS Cur_PTO
      , ISNULL(util.YTD_PTO,0) AS YTD_PTO
      , ISNULL(bdg.Util_BdgPTO,0) AS Bdg_PTO
+	 , ISNULL(bdg.Util_BdgPTO_Adjust,0) AS Bdg_PTO_Adjust
      , ISNULL(util.Cur_Train,0) AS Cur_Train
     , ISNULL(util.YTD_Train,0) AS YTD_Train
      , ISNULL(bdg.Util_BdgTrain,0) AS Bdg_Train
@@ -154,6 +155,7 @@ FULL JOIN (SELECT ubdg.Emp_Key
            , ubdg.Util_BdgMkt
            , ubdg.Util_BdgProp
            , ubdg.Util_BdgPTO
+		   , ubdg.Util_BdgPTO_Adjust
            , ubdg.Util_BdgTrain
            , ubdg.Util_BdgStd
            , ubdg.Util_BdgTotal
@@ -313,6 +315,10 @@ ON util.Emp_Key = uexp.Emp_Key</CommandText>
       </Field>
       <Field Name="Bdg_PTO">
         <DataField>Bdg_PTO</DataField>
+        <rd:TypeName>System.Double</rd:TypeName>
+      </Field>
+      <Field Name="Bdg_PTO_Adjust">
+        <DataField>Bdg_PTO_Adjust</DataField>
         <rd:TypeName>System.Double</rd:TypeName>
       </Field>
       <Field Name="Cur_Train">
